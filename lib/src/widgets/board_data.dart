@@ -311,24 +311,35 @@ class AATexBoardController extends ChangeNotifier
     }
     Log.debug('Found item at index $itemIndex in group "$groupId"');
 
-    // Убрана часть с выделением карточек, теперь просто прокручиваем к нужной карточке
-
     // Scroll to make the card visible if a scroll controller is provided
     try {
       if (boardScrollController != null) {
-        Log.debug('Scroll controller provided, attempting to scroll to item...');
-        // First, scroll to the item in the group
-        boardScrollController.scrollToItem(
+        Log.debug('Scroll controller provided, attempting to scroll to group and item...');
+
+        // Создаем Completer для ожидания завершения прокрутки
+        final completer = Completer<bool>();
+
+        // Сначала прокручиваем к колонке горизонтально, чтобы она была видима
+        Log.debug('First, scrolling horizontally to make column visible...');
+        boardScrollController.scrollToGroup(
           groupId,
-          itemIndex,
-          // Optional callback when scrolling completes
           completed: (context) {
-            Log.debug('Scroll completed - item $itemId in group $groupId is now visible');
+            Log.debug('Horizontal scroll completed, now scrolling to specific item...');
+
+            // Затем прокручиваем к элементу в колонке вертикально
+            boardScrollController.scrollToItem(
+              groupId,
+              itemIndex,
+              completed: (context) {
+                Log.debug('Vertical scroll completed - item $itemId in group $groupId is now visible');
+                completer.complete(true);
+              },
+            );
           },
         );
-        Log.debug('Scroll command issued successfully');
-        Log.debug('====== END DISPLAY CARD (SUCCESS) ======');
-        return true;
+
+        Log.debug('Scroll commands issued successfully');
+        return await completer.future;
       } else {
         Log.warn('Cannot scroll to card: No board scroll controller provided');
         Log.debug('No scrolling performed (no controller)');
