@@ -27,54 +27,32 @@ class _MultiBoardListExampleState extends State<MultiBoardListExample> {
   void initState() {
     super.initState();
     boardController = AATexBoardScrollController();
-    final group1 = AATexGroupData(
-      id: "To Do",
-      name: "To Do",
-      items: [
-        TextItem("Card 1"),
-        TextItem("Card 2"),
-        RichTextItem(title: "Card 3", subtitle: 'Aug 1, 2020 4:05 PM'),
-        TextItem("Card 4"),
-        TextItem("Card 5"),
-      ],
-    );
 
-    final group2 = AATexGroupData(
-      id: "In Progress",
-      name: "In Progress",
-      items: <AATexGroupItem>[
-        TextItem("Card 6"),
-        RichTextItem(title: "Card 7", subtitle: 'Aug 1, 2020 4:05 PM'),
-        RichTextItem(title: "Card 8", subtitle: 'Aug 1, 2020 4:05 PM'),
-      ],
-    );
+    // Create 10 columns with 50 items each
+    for (int colIndex = 1; colIndex <= 10; colIndex++) {
+      final List<AATexGroupItem> items = [];
 
-    final group3 = AATexGroupData(
-      id: "Pending",
-      name: "Pending",
-      items: <AATexGroupItem>[
-        TextItem("Card 9"),
-        RichTextItem(title: "Card 10", subtitle: 'Aug 1, 2020 4:05 PM'),
-        TextItem("Card 11"),
-        TextItem("Card 12"),
-      ],
-    );
-    final group4 = AATexGroupData(
-      id: "Canceled",
-      name: "Canceled",
-      items: <AATexGroupItem>[TextItem("Card 13"), TextItem("Card 14"), TextItem("Card 15")],
-    );
-    final group5 = AATexGroupData(
-      id: "Urgent",
-      name: "Urgent",
-      items: <AATexGroupItem>[TextItem("Card 14"), TextItem("Card 15")],
-    );
+      // Add 50 items to each column
+      for (int itemIndex = 1; itemIndex <= 50; itemIndex++) {
+        final itemId = "item_${colIndex}_$itemIndex";
 
-    controller.addGroup(group1);
-    controller.addGroup(group2);
-    controller.addGroup(group3);
-    controller.addGroup(group4);
-    controller.addGroup(group5);
+        // Add a mix of TextItems and RichTextItems
+        if (itemIndex % 5 == 0) {
+          items.add(RichTextItem(title: "Card $itemId", subtitle: 'April 11, 2025 - Item #$itemIndex'));
+        } else {
+          items.add(TextItem("Card $itemId"));
+        }
+      }
+
+      final column = AATexGroupData(id: "column_$colIndex", name: "Column $colIndex", items: items);
+
+      controller.addGroup(column);
+    }
+  }
+
+  void _showCard() {
+    // Display card #43 in column 8
+    controller.displayCard(groupId: "column_8", itemId: "item_8_43", highlightColor: Colors.amber.withOpacity(0.5));
   }
 
   @override
@@ -83,56 +61,85 @@ class _MultiBoardListExampleState extends State<MultiBoardListExample> {
       groupBackgroundColor: HexColor.fromHex('#F7F8FC'),
       stretchGroupHeight: false,
     );
-    return AATexBoard(
-      controller: controller,
-      cardBuilder: (context, group, groupItem) {
-        return AATexGroupCard(key: ValueKey(groupItem.id), child: _buildCard(groupItem));
-      },
-      boardScrollController: boardController,
-      footerBuilder: (context, columnData) {
-        return AATexGroupFooter(
-          icon: const Icon(Icons.add, size: 20),
-          title: const Text('New'),
-          height: 50,
-          margin: config.groupBodyPadding,
-          onAddButtonClick: () {
-            boardController.scrollToBottom(columnData.id);
-          },
-        );
-      },
-      headerBuilder: (context, columnData) {
-        return AATexGroupHeader(
-          icon: const Icon(Icons.lightbulb_circle),
-          title: SizedBox(
-            width: 60,
-            child: TextField(
-              controller: TextEditingController()..text = columnData.headerData.groupName,
-              onSubmitted: (val) {
-                controller.getGroupController(columnData.headerData.groupId)!.updateGroupName(val);
-              },
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Multi-Column Board Example'),
+        actions: [
+          // Button to find and highlight card #43 in column 8
+          IconButton(icon: const Icon(Icons.search), tooltip: 'Find card #43 in column 8', onPressed: _showCard),
+        ],
+      ),
+      body: AATexBoard(
+        controller: controller,
+        cardBuilder: (context, group, groupItem) {
+          return AATexGroupCard(key: ValueKey(groupItem.id), child: _buildCard(groupItem));
+        },
+        boardScrollController: boardController,
+        footerBuilder: (context, columnData) {
+          return AATexGroupFooter(
+            icon: const Icon(Icons.add, size: 20),
+            title: const Text('New'),
+            height: 50,
+            margin: config.groupBodyPadding,
+            onAddButtonClick: () {
+              boardController.scrollToBottom(columnData.id);
+            },
+          );
+        },
+        headerBuilder: (context, columnData) {
+          return AATexGroupHeader(
+            icon: const Icon(Icons.lightbulb_circle),
+            title: SizedBox(
+              width: 60,
+              child: TextField(
+                controller: TextEditingController()..text = columnData.headerData.groupName,
+                onSubmitted: (val) {
+                  controller.getGroupController(columnData.headerData.groupId)!.updateGroupName(val);
+                },
+              ),
             ),
-          ),
-          addIcon: const Icon(Icons.add, size: 20),
-          moreIcon: const Icon(Icons.more_horiz, size: 20),
-          height: 50,
-          margin: config.groupBodyPadding,
-        );
-      },
-      groupConstraints: const BoxConstraints.tightFor(width: 240),
-      config: config,
+            addIcon: const Icon(Icons.add, size: 20),
+            moreIcon: const Icon(Icons.more_horiz, size: 20),
+            height: 50,
+            margin: config.groupBodyPadding,
+          );
+        },
+        groupConstraints: const BoxConstraints.tightFor(width: 240),
+        config: config,
+      ),
     );
   }
 
   Widget _buildCard(AATexGroupItem item) {
+    // Check if the item is active
+    final isActive = item is ActiveableGroupItem && (item as ActiveableGroupItem).isActive;
+    final highlightColor = (item is ActiveableGroupItem) ? (item as ActiveableGroupItem).highlightColor : null;
+
+    // Apply highlight style if item is active
+    final decoration =
+        isActive
+            ? BoxDecoration(
+              color: highlightColor ?? Colors.blue.withOpacity(0.2),
+              border: Border.all(color: Colors.blue, width: 2),
+              borderRadius: BorderRadius.circular(4),
+            )
+            : null;
+
     if (item is TextItem) {
-      return Align(
-        alignment: Alignment.centerLeft,
-        child: Padding(padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 30), child: Text(item.s)),
+      return Container(
+        decoration: decoration,
+        child: Align(
+          alignment: Alignment.centerLeft,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 30),
+            child: Text(item.s, style: TextStyle(fontWeight: isActive ? FontWeight.bold : FontWeight.normal)),
+          ),
+        ),
       );
     }
 
     if (item is RichTextItem) {
-      return RichTextCard(item: item);
+      return Container(decoration: decoration, child: RichTextCard(item: item));
     }
 
     throw UnimplementedError();
@@ -167,23 +174,58 @@ class _RichTextCardState extends State<RichTextCard> {
   }
 }
 
-class TextItem extends AATexGroupItem {
+class TextItem extends AATexGroupItem implements ActiveableGroupItem {
   final String s;
+  final bool _isActive;
+  final Color? _highlightColor;
 
-  TextItem(this.s);
+  TextItem(this.s, {bool isActive = false, Color? highlightColor})
+    : _isActive = isActive,
+      _highlightColor = highlightColor;
 
   @override
   String get id => s;
+
+  @override
+  bool get isActive => _isActive;
+
+  @override
+  Color? get highlightColor => _highlightColor;
+
+  @override
+  TextItem copyWith({bool? isActive, Color? highlightColor}) {
+    return TextItem(s, isActive: isActive ?? _isActive, highlightColor: highlightColor ?? _highlightColor);
+  }
 }
 
-class RichTextItem extends AATexGroupItem {
+class RichTextItem extends AATexGroupItem implements ActiveableGroupItem {
   final String title;
   final String subtitle;
+  final bool _isActive;
+  final Color? _highlightColor;
 
-  RichTextItem({required this.title, required this.subtitle});
+  RichTextItem({required this.title, required this.subtitle, bool isActive = false, Color? highlightColor})
+    : _isActive = isActive,
+      _highlightColor = highlightColor;
 
   @override
   String get id => title;
+
+  @override
+  bool get isActive => _isActive;
+
+  @override
+  Color? get highlightColor => _highlightColor;
+
+  @override
+  RichTextItem copyWith({bool? isActive, Color? highlightColor}) {
+    return RichTextItem(
+      title: title,
+      subtitle: subtitle,
+      isActive: isActive ?? _isActive,
+      highlightColor: highlightColor ?? _highlightColor,
+    );
+  }
 }
 
 extension HexColor on Color {

@@ -9,6 +9,21 @@ import 'package:aatex_board/src/widgets/reorder_flex/reorder_flex.dart';
 
 typedef IsDraggable = bool;
 
+/// Interface for group items that can be activated/highlighted
+abstract class ActiveableGroupItem {
+  /// Whether this item is currently active (highlighted)
+  bool get isActive;
+
+  /// Color used for highlighting this item when active
+  Color? get highlightColor;
+
+  /// Creates a copy of this item with the specified active state and highlight color
+  ActiveableGroupItem copyWith({
+    bool? isActive,
+    Color? highlightColor,
+  });
+}
+
 /// A item represents the generic data model of each group card.
 ///
 /// Each item displayed in the group required to implement this class.

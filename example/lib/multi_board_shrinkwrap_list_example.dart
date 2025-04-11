@@ -5,22 +5,20 @@ class MultiBoardShrinkwrapListExample extends StatefulWidget {
   const MultiBoardShrinkwrapListExample({Key? key}) : super(key: key);
 
   @override
-  State<MultiBoardShrinkwrapListExample> createState() =>
-      _MultiBoardShrinkwrapListExampleState();
+  State<MultiBoardShrinkwrapListExample> createState() => _MultiBoardShrinkwrapListExampleState();
 }
 
-class _MultiBoardShrinkwrapListExampleState
-    extends State<MultiBoardShrinkwrapListExample> {
+class _MultiBoardShrinkwrapListExampleState extends State<MultiBoardShrinkwrapListExample> {
   final AATexBoardController controller = AATexBoardController(
     onMoveGroup: (fromGroupId, fromIndex, toGroupId, toIndex) {
       debugPrint('Move item from $fromIndex to $toIndex');
     },
-    onMoveGroupItem: (groupId, fromIndex, toIndex) {
-      debugPrint('Move $groupId:$fromIndex to $groupId:$toIndex');
-    },
-    onMoveGroupItemToGroup: (fromGroupId, fromIndex, toGroupId, toIndex) {
-      debugPrint('Move $fromGroupId:$fromIndex to $toGroupId:$toIndex');
-    },
+    // onMoveGroupItem: (groupId, fromIndex, toIndex) {
+    //   debugPrint('Move $groupId:$fromIndex to $groupId:$toIndex');
+    // },
+    // onMoveGroupItemToGroup: (fromGroupId, fromIndex, toGroupId, toIndex) {
+    //   debugPrint('Move $fromGroupId:$fromIndex to $toGroupId:$toIndex');
+    // },
   );
 
   late AATexBoardScrollController boardController;
@@ -29,15 +27,19 @@ class _MultiBoardShrinkwrapListExampleState
   void initState() {
     super.initState();
     boardController = AATexBoardScrollController();
-    final group1 = AATexGroupData(id: "To Do", name: "To Do", items: [
-      TextItem("Card 1"),
-      TextItem("Card 2"),
-      RichTextItem(title: "Card 3", subtitle: 'Aug 1, 2020 4:05 PM'),
-      TextItem("Card 4"),
-      TextItem("Card 5"),
-      TextItem("Card 6"),
-      TextItem("Card 7"),
-    ]);
+    final group1 = AATexGroupData(
+      id: "To Do",
+      name: "To Do",
+      items: [
+        TextItem("Card 1"),
+        TextItem("Card 2"),
+        RichTextItem(title: "Card 3", subtitle: 'Aug 1, 2020 4:05 PM'),
+        TextItem("Card 4"),
+        TextItem("Card 5"),
+        TextItem("Card 6"),
+        TextItem("Card 7"),
+      ],
+    );
 
     final group2 = AATexGroupData(
       id: "In Progress",
@@ -50,29 +52,25 @@ class _MultiBoardShrinkwrapListExampleState
     );
 
     final group3 = AATexGroupData(
-        id: "Pending",
-        name: "Pending",
-        items: <AATexGroupItem>[
-          TextItem("Card 9"),
-          RichTextItem(title: "Card 10", subtitle: 'Aug 1, 2020 4:05 PM'),
-          TextItem("Card 11"),
-          TextItem("Card 12"),
-        ]);
+      id: "Pending",
+      name: "Pending",
+      items: <AATexGroupItem>[
+        TextItem("Card 9"),
+        RichTextItem(title: "Card 10", subtitle: 'Aug 1, 2020 4:05 PM'),
+        TextItem("Card 11"),
+        TextItem("Card 12"),
+      ],
+    );
     final group4 = AATexGroupData(
-        id: "Canceled",
-        name: "Canceled",
-        items: <AATexGroupItem>[
-          TextItem("Card 13"),
-          TextItem("Card 14"),
-          TextItem("Card 15"),
-        ]);
+      id: "Canceled",
+      name: "Canceled",
+      items: <AATexGroupItem>[TextItem("Card 13"), TextItem("Card 14"), TextItem("Card 15")],
+    );
     final group5 = AATexGroupData(
-        id: "Urgent",
-        name: "Urgent",
-        items: <AATexGroupItem>[
-          TextItem("Card 14"),
-          TextItem("Card 15"),
-        ]);
+      id: "Urgent",
+      name: "Urgent",
+      items: <AATexGroupItem>[TextItem("Card 14"), TextItem("Card 15")],
+    );
 
     controller.addGroup(group1);
     controller.addGroup(group2);
@@ -83,55 +81,49 @@ class _MultiBoardShrinkwrapListExampleState
 
   @override
   Widget build(BuildContext context) {
-    final config = AATexBoardConfig(
+    final config = AATexBoardConfig.config(
       groupBackgroundColor: HexColor.fromHex('#F7F8FC'),
       stretchGroupHeight: false,
     );
     return SingleChildScrollView(
       child: AATexBoard(
-          controller: controller,
-          shrinkWrap: true,
-          cardBuilder: (context, group, groupItem) {
-            return AATexGroupCard(
-              key: ValueKey(groupItem.id),
-              child: _buildCard(groupItem),
-            );
-          },
-          boardScrollController: boardController,
-          footerBuilder: (context, columnData) {
-            return AATexGroupFooter(
-              icon: const Icon(Icons.add, size: 20),
-              title: const Text('New'),
-              height: 50,
-              margin: config.groupBodyPadding,
-              onAddButtonClick: () {
-                boardController.scrollToBottom(columnData.id);
-              },
-            );
-          },
-          headerBuilder: (context, columnData) {
-            return AATexGroupHeader(
-              icon: const Icon(Icons.lightbulb_circle),
-              title: SizedBox(
-                width: 60,
-                child: TextField(
-                  controller: TextEditingController()
-                    ..text = columnData.headerData.groupName,
-                  onSubmitted: (val) {
-                    controller
-                        .getGroupController(columnData.headerData.groupId)!
-                        .updateGroupName(val);
-                  },
-                ),
+        controller: controller,
+        cardBuilder: (context, group, groupItem) {
+          return AATexGroupCard(key: ValueKey(groupItem.id), child: _buildCard(groupItem));
+        },
+        boardScrollController: boardController,
+        footerBuilder: (context, columnData) {
+          return AATexGroupFooter(
+            icon: const Icon(Icons.add, size: 20),
+            title: const Text('New'),
+            height: 50,
+            margin: config.groupBodyPadding,
+            onAddButtonClick: () {
+              boardController.scrollToBottom(columnData.id);
+            },
+          );
+        },
+        headerBuilder: (context, columnData) {
+          return AATexGroupHeader(
+            icon: const Icon(Icons.lightbulb_circle),
+            title: SizedBox(
+              width: 60,
+              child: TextField(
+                controller: TextEditingController()..text = columnData.headerData.groupName,
+                onSubmitted: (val) {
+                  controller.getGroupController(columnData.headerData.groupId)!.updateGroupName(val);
+                },
               ),
-              addIcon: const Icon(Icons.add, size: 20),
-              moreIcon: const Icon(Icons.more_horiz, size: 20),
-              height: 50,
-              margin: config.groupBodyPadding,
-            );
-          },
-          groupConstraints: const BoxConstraints.tightFor(width: 240),
-          config: config),
+            ),
+            addIcon: const Icon(Icons.add, size: 20),
+            moreIcon: const Icon(Icons.more_horiz, size: 20),
+            height: 50,
+            margin: config.groupBodyPadding,
+          );
+        },
+        groupConstraints: const BoxConstraints.tightFor(width: 240),
+        config: config,
+      ),
     );
   }
 
@@ -139,10 +131,7 @@ class _MultiBoardShrinkwrapListExampleState
     if (item is TextItem) {
       return Align(
         alignment: Alignment.centerLeft,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 30),
-          child: Text(item.s),
-        ),
+        child: Padding(padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 30), child: Text(item.s)),
       );
     }
 
@@ -156,10 +145,7 @@ class _MultiBoardShrinkwrapListExampleState
 
 class RichTextCard extends StatefulWidget {
   final RichTextItem item;
-  const RichTextCard({
-    required this.item,
-    Key? key,
-  }) : super(key: key);
+  const RichTextCard({required this.item, Key? key}) : super(key: key);
 
   @override
   State<RichTextCard> createState() => _RichTextCardState();
@@ -175,16 +161,9 @@ class _RichTextCardState extends State<RichTextCard> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              widget.item.title,
-              style: const TextStyle(fontSize: 14),
-              textAlign: TextAlign.left,
-            ),
+            Text(widget.item.title, style: const TextStyle(fontSize: 14), textAlign: TextAlign.left),
             const SizedBox(height: 10),
-            Text(
-              widget.item.subtitle,
-              style: const TextStyle(fontSize: 12, color: Colors.grey),
-            )
+            Text(widget.item.subtitle, style: const TextStyle(fontSize: 12, color: Colors.grey)),
           ],
         ),
       ),

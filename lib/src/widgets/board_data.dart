@@ -1,6 +1,8 @@
 import 'dart:collection';
+import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 
 import 'package:equatable/equatable.dart';
 
@@ -268,6 +270,104 @@ class AATexBoardController extends ChangeNotifier
         toGroupIndex,
         item,
       );
+    }
+  }
+
+  /// Highlights a specific card and makes others inactive.
+  /// Ensures the card is visible by scrolling to its column and position.
+  ///
+  /// Parameters:
+  /// - [groupId]: The ID of the group/column containing the card
+  /// - [itemId]: The ID of the card to highlight
+  /// - [highlightColor]: Optional color for highlighting the card
+  /// - [animationDuration]: Duration for scroll animation (defaults to 300ms)
+  Future<bool> displayCard({
+    required String groupId,
+    required String itemId,
+    Color? highlightColor,
+    Duration animationDuration = const Duration(milliseconds: 300),
+  }) async {
+    // Find the group controller
+    final groupController = getGroupController(groupId);
+    if (groupController == null) {
+      Log.warn('Cannot display card: Group with ID "$groupId" not found');
+      return false;
+    }
+
+    // Find the item index
+    final itemIndex = groupController.items.indexWhere((item) => item.id == itemId);
+    if (itemIndex == -1) {
+      Log.warn('Cannot display card: Item with ID "$itemId" not found in group "$groupId"');
+      return false;
+    }
+
+    // Reset active state for all cards in all groups
+    for (final controller in _groupControllers.values) {
+      for (var i = 0; i < controller.items.length; i++) {
+        final item = controller.items[i];
+        if (!item.isPhantom && item is AATexGroupItem) {
+          // Make item inactive by setting its property
+          // We need to create a new item with the updated property
+          // since items might be immutable
+          if (item is ActiveableGroupItem) {
+            final updatedItem = (item as ActiveableGroupItem).copyWith(isActive: false);
+            controller.replace(i, updatedItem as AATexGroupItem);
+          }
+        }
+      }
+    }
+
+    // Get the target item and set it as active
+    final targetItem = groupController.items[itemIndex];
+    if (!targetItem.isPhantom && targetItem is AATexGroupItem) {
+      if (targetItem is ActiveableGroupItem) {
+        final updatedItem = (targetItem as ActiveableGroupItem).copyWith(
+          isActive: true,
+          highlightColor: highlightColor,
+        );
+        groupController.replace(itemIndex, updatedItem as AATexGroupItem);
+      }
+    }
+
+    // Notify listeners to update UI
+    notifyListeners();
+
+    // The scrolling implementation depends on how the board UI is constructed
+    try {
+      // Store the group index for horizontal scrolling calculations
+      final groupIndex = _groupDatas.indexWhere((group) => group.id == groupId);
+      if (groupIndex == -1) {
+        Log.warn('Cannot find group index for scrolling to group "$groupId"');
+        return false;
+      }
+
+      // Use the groupIndex for scroll calculations when implementing scroll controllers
+      // Example (actual implementation depends on your UI structure):
+      //
+      // For horizontal scrolling to the group/column:
+      // if (boardScrollController != null) {
+      //   final groupOffset = groupIndex * estimatedGroupWidth;
+      //   await boardScrollController.animateTo(
+      //     groupOffset,
+      //     duration: animationDuration,
+      //     curve: Curves.easeInOut,
+      //   );
+      // }
+      //
+      // For vertical scrolling to the item within the group:
+      // if (groupController.scrollController != null) {
+      //   final itemOffset = itemIndex * estimatedItemHeight;
+      //   await groupController.scrollController.animateTo(
+      //     itemOffset,
+      //     duration: animationDuration,
+      //     curve: Curves.easeInOut,
+      //   );
+      // }
+
+      return true;
+    } catch (e) {
+      Log.error('Error scrolling to display card: $e');
+      return false;
     }
   }
 

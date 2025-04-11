@@ -29,32 +29,28 @@ class _MyAppState extends State<MyApp> {
   Widget build(BuildContext context) {
     return MaterialApp(
       home: Scaffold(
-          appBar: AppBar(
-            title: const Text('AATex Board'),
-          ),
-          body: Container(color: Colors.white, child: _examples[_currentIndex]),
-          bottomNavigationBar: BottomNavigationBar(
-            fixedColor: _bottomNavigationColor,
-            showSelectedLabels: true,
-            showUnselectedLabels: false,
-            currentIndex: _currentIndex,
-            items: [
-              BottomNavigationBarItem(
-                  icon: Icon(Icons.grid_on, color: _bottomNavigationColor),
-                  label: "MultiColumn"),
-              BottomNavigationBarItem(
-                  icon: Icon(Icons.grid_on, color: _bottomNavigationColor),
-                  label: "MultiShrinkwrapColumn "),
-              BottomNavigationBarItem(
-                  icon: Icon(Icons.grid_on, color: _bottomNavigationColor),
-                  label: "SingleColumn"),
-            ],
-            onTap: (int index) {
-              setState(() {
-                _currentIndex = index;
-              });
-            },
-          )),
+        appBar: AppBar(title: const Text('AATex Board')),
+        body: Container(color: Colors.white, child: _examples[_currentIndex]),
+        bottomNavigationBar: BottomNavigationBar(
+          fixedColor: _bottomNavigationColor,
+          showSelectedLabels: true,
+          showUnselectedLabels: false,
+          currentIndex: _currentIndex,
+          items: [
+            BottomNavigationBarItem(icon: Icon(Icons.grid_on, color: _bottomNavigationColor), label: "MultiColumn"),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.grid_on, color: _bottomNavigationColor),
+              label: "MultiShrinkwrapColumn ",
+            ),
+            BottomNavigationBarItem(icon: Icon(Icons.grid_on, color: _bottomNavigationColor), label: "SingleColumn"),
+          ],
+          onTap: (int index) {
+            setState(() {
+              _currentIndex = index;
+            });
+          },
+        ),
+      ),
     );
   }
 }
