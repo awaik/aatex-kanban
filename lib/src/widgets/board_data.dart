@@ -59,7 +59,7 @@ typedef OnStartDraggingCard = void Function(
 /// one group to another group.
 class AATexBoardController extends ChangeNotifier
     with EquatableMixin
-    implements BoardPhantomControllerDelegate, ReoderFlexDataSource {
+    implements BoardPhantomControllerDelegate, ReorderFlexDataSource {
   AATexBoardController({
     this.onMoveGroup,
     this.onMoveGroupItem,

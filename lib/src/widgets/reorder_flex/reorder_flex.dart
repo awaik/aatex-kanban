@@ -16,7 +16,7 @@ typedef OnDragStarted = void Function(int index);
 typedef OnDragEnded = void Function();
 typedef OnReorder = void Function(int fromIndex, int toIndex);
 
-abstract class ReoderFlexDataSource {
+abstract class ReorderFlexDataSource {
   /// [identifier] represents the id the [ReorderFlex]. It must be unique.
   String get identifier;
 
@@ -117,7 +117,7 @@ class ReorderFlex extends StatefulWidget {
           'All child must have a key.',
         );
 
-  final ReoderFlexDataSource dataSource;
+  final ReorderFlexDataSource dataSource;
   final List<Widget> children;
   final ReorderFlexConfig config;
 

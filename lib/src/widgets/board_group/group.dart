@@ -39,7 +39,7 @@ typedef AATexBoardFooterBuilder = Widget Function(
   AATexGroupData groupData,
 );
 
-abstract class AATexGroupDataDataSource implements ReoderFlexDataSource {
+abstract class AATexGroupDataDataSource implements ReorderFlexDataSource {
   AATexGroupData get groupData;
 
   List<String> get acceptedGroupIds;
