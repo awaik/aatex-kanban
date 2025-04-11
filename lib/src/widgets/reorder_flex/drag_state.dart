@@ -29,7 +29,7 @@ class FlexDragTargetData extends DragTargetData {
   final int draggingIndex;
 
   final String reorderFlexId;
-  final ReoderFlexItem reorderFlexItem;
+  final ReorderFlexItem reorderFlexItem;
   final GlobalObjectKey dragTargetIndexKey;
   final DraggingState _draggingState;
 
@@ -40,8 +40,7 @@ class FlexDragTargetData extends DragTargetData {
   bool get isDragging => _draggingState.isDragging();
 
   @override
-  String toString() =>
-      'ReorderFlexId: $reorderFlexId, dragTargetId: $dragTargetId';
+  String toString() => 'ReorderFlexId: $reorderFlexId, dragTargetId: $dragTargetId';
 
   bool isOverlapWithWidgets(List<GlobalObjectKey> widgetKeys) {
     final renderBox = dragTargetIndexKey.currentContext?.findRenderObject();
@@ -53,8 +52,7 @@ class FlexDragTargetData extends DragTargetData {
     for (final widgetKey in widgetKeys) {
       final renderObject = widgetKey.currentContext?.findRenderObject();
       if (renderObject != null && renderObject is RenderBox) {
-        final Rect widgetRect =
-            renderObject.localToGlobal(Offset.zero) & renderObject.size;
+        final Rect widgetRect = renderObject.localToGlobal(Offset.zero) & renderObject.size;
         return dragTargetRect.overlaps(widgetRect);
       }
     }

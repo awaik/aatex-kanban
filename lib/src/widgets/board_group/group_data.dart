@@ -31,7 +31,7 @@ abstract class ActiveableGroupItem {
 /// A item represents the generic data model of each group card.
 ///
 /// Each item displayed in the group required to implement this class.
-abstract class AATexGroupItem extends ReoderFlexItem {
+abstract class AATexGroupItem extends ReorderFlexItem {
   bool get isPhantom => false;
 
   @override
@@ -207,7 +207,7 @@ class AATexGroupController extends ChangeNotifier with EquatableMixin {
 }
 
 /// [AATexGroupData] represents the data of each group of the Board.
-class AATexGroupData<T> extends ReoderFlexItem with EquatableMixin {
+class AATexGroupData<T> extends ReorderFlexItem with EquatableMixin {
   AATexGroupData({
     required this.id,
     required String name,

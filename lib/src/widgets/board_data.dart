@@ -204,10 +204,45 @@ class AATexBoardController extends ChangeNotifier
 
   /// Moves the group's item from [fromIndex] to [toIndex]
   /// If the group with id [groupId] is not exist, this method will do nothing.
-  void moveGroupItem<T>(String groupId, int fromIndex, int toIndex, T item) {
-    if (getGroupController(groupId)?.move(fromIndex, toIndex) ?? false) {
-      onMoveGroupItem?.call(groupId, fromIndex, toIndex, item);
+  ///
+  /// Returns true if the move was successful, false otherwise.
+  Future<bool> moveGroupItem<T>(String groupId, int fromIndex, int toIndex, T item) async {
+    // Validate indexes to prevent out-of-range errors
+    final controller = getGroupController(groupId);
+    if (controller == null) {
+      Log.warn('Cannot move item: Group with ID "$groupId" not found');
+      return false;
     }
+
+    // Validate index bounds
+    if (fromIndex < 0 || fromIndex >= controller.items.length) {
+      Log.warn('Cannot move item: fromIndex ($fromIndex) out of bounds [0..${controller.items.length - 1}]');
+      return false;
+    }
+
+    if (toIndex < 0 || toIndex >= controller.items.length) {
+      Log.warn('Cannot move item: toIndex ($toIndex) out of bounds [0..${controller.items.length - 1}]');
+      return false;
+    }
+
+    // Check if we're trying to move a phantom item
+    final itemToMove = controller.items[fromIndex];
+    if (itemToMove.isPhantom) {
+      Log.warn('Cannot move phantom item at index $fromIndex');
+      return false;
+    }
+
+    // Perform the move and notify callback if successful
+    final success = controller.move(fromIndex, toIndex);
+    if (success) {
+      // Use a microtask to ensure UI updates before callback executes
+      await Future.microtask(() {
+        onMoveGroupItem?.call(groupId, fromIndex, toIndex, item);
+      });
+      return true;
+    }
+
+    return false;
   }
 
   /// Adds the [AATexGroupItem] to the end of the group
@@ -421,7 +456,7 @@ class AATexBoardController extends ChangeNotifier
   String get identifier => '$AATexBoardController';
 
   @override
-  UnmodifiableListView<ReoderFlexItem> get items => UnmodifiableListView(_groupDatas);
+  UnmodifiableListView<ReorderFlexItem> get items => UnmodifiableListView(_groupDatas);
 
   @override
   @protected

@@ -20,12 +20,12 @@ abstract class ReorderFlexDataSource {
   /// [identifier] represents the id the [ReorderFlex]. It must be unique.
   String get identifier;
 
-  /// The number of [ReoderFlexItem]s will be displayed in the [ReorderFlex].
-  UnmodifiableListView<ReoderFlexItem> get items;
+  /// The number of [ReorderFlexItem]s will be displayed in the [ReorderFlex].
+  UnmodifiableListView<ReorderFlexItem> get items;
 }
 
-/// Each item displayed in the [ReorderFlex] required to implement the [ReoderFlexItem].
-abstract class ReoderFlexItem {
+/// Each item displayed in the [ReorderFlex] required to implement the [ReorderFlexItem].
+abstract class ReorderFlexItem {
   /// [id] is used to identify the item. It must be unique.
   String get id;
 
@@ -236,7 +236,7 @@ class ReorderFlexState extends State<ReorderFlex> with ReorderFlexMixin, TickerP
 
     for (int i = 0; i < widget.children.length; i++) {
       final Widget child = widget.children[i];
-      final ReoderFlexItem item = widget.dataSource.items[i];
+      final ReorderFlexItem item = widget.dataSource.items[i];
 
       final indexKey = GlobalObjectKey(child.key!);
       // Save the index key for quick access
