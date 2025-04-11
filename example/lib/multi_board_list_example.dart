@@ -55,7 +55,7 @@ class _MultiBoardListExampleState extends State<MultiBoardListExample> {
         }
       }
 
-      final column = AATexGroupData(id: "column_$colIndex", name: "Column $colIndex", items: items);
+      final column = AATexGroupData(id: "column_$colIndex", name: "Col_$colIndex", items: items);
 
       controller.addGroup(column);
     }

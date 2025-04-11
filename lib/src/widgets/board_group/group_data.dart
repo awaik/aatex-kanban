@@ -34,6 +34,14 @@ abstract class ActiveableGroupItem {
 abstract class AATexGroupItem extends ReorderFlexItem {
   bool get isPhantom => false;
 
+  /// Controls if this item should animate when moving between groups
+  /// Default is true
+  bool get animateOnGroupChange => true;
+
+  /// Duration for cross-group animation
+  /// If null, system default will be used
+  Duration? get crossGroupAnimationDuration => null;
+
   @override
   String toString() => id;
 }

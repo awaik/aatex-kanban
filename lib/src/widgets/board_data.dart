@@ -65,6 +65,8 @@ class AATexBoardController extends ChangeNotifier
     this.onMoveGroupItem,
     this.onMoveGroupItemToGroup,
     this.onStartDraggingCard,
+    this.crossGroupAnimationDuration = const Duration(milliseconds: 500),
+    this.enableCrossGroupAnimation = true,
   });
 
   final List<AATexGroupData> _groupDatas = [];
@@ -81,6 +83,12 @@ class AATexBoardController extends ChangeNotifier
   final OnMoveGroupItemToGroup? onMoveGroupItemToGroup;
 
   final OnStartDraggingCard? onStartDraggingCard;
+
+  /// Default duration for cross-group animation
+  final Duration crossGroupAnimationDuration;
+
+  /// Whether cross-group animations are enabled by default
+  final bool enableCrossGroupAnimation;
 
   /// Returns the unmodifiable list of [AATexGroupData]
   UnmodifiableListView<AATexGroupData> get groupDatas => UnmodifiableListView(_groupDatas);
@@ -298,14 +306,40 @@ class AATexBoardController extends ChangeNotifier
     if (toGroupController.items.length > toGroupIndex) {
       assert(toGroupController.items[toGroupIndex] is PhantomGroupItem);
 
-      toGroupController.replace(toGroupIndex, fromGroupItem);
-      onMoveGroupItemToGroup?.call(
-        fromGroupId,
-        fromGroupIndex,
-        toGroupId,
-        toGroupIndex,
-        item,
-      );
+      // Check if animation should be applied
+      bool shouldAnimate = enableCrossGroupAnimation;
+      if (fromGroupItem.animateOnGroupChange != null) {
+        shouldAnimate = fromGroupItem.animateOnGroupChange!;
+      }
+
+      // Get animation duration (use item-specific if available, otherwise default)
+      final animDuration = fromGroupItem.crossGroupAnimationDuration ?? crossGroupAnimationDuration;
+
+      if (shouldAnimate) {
+        // Apply animation and make move after animation completes
+        toGroupController.replace(toGroupIndex, fromGroupItem);
+
+        // Delay the notification to simulate animation
+        Future.delayed(animDuration, () {
+          onMoveGroupItemToGroup?.call(
+            fromGroupId,
+            fromGroupIndex,
+            toGroupId,
+            toGroupIndex,
+            item,
+          );
+        });
+      } else {
+        // No animation, immediate move
+        toGroupController.replace(toGroupIndex, fromGroupItem);
+        onMoveGroupItemToGroup?.call(
+          fromGroupId,
+          fromGroupIndex,
+          toGroupId,
+          toGroupIndex,
+          item,
+        );
+      }
     }
   }
 
