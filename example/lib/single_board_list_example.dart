@@ -64,13 +64,28 @@ class _RowWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // Check if this item is active, show highlight if it is
-    final isActive = item is ActiveableGroupItem && (item as ActiveableGroupItem).isActive;
-    final highlightColor = (item is ActiveableGroupItem) ? (item as ActiveableGroupItem).highlightColor : null;
+    final isActive = (item as ActiveableGroupItem).isActive;
+    final highlightColor = (item as ActiveableGroupItem).highlightColor;
+    final highlightBorder = (item as ActiveableGroupItem).highlightBorder;
+
+    // Создаем decoration с рамкой, если элемент активен
+    BoxDecoration decoration = BoxDecoration(
+      color: isActive ? (highlightColor ?? Colors.blue.withOpacity(0.3)) : Colors.green,
+    );
+
+    // Добавляем рамку для активного элемента
+    if (isActive && highlightBorder != null) {
+      decoration = BoxDecoration(
+        color: isActive ? (highlightColor ?? Colors.blue.withOpacity(0.3)) : Colors.green,
+        border: Border(top: highlightBorder, left: highlightBorder, right: highlightBorder, bottom: highlightBorder),
+        borderRadius: BorderRadius.circular(4),
+      );
+    }
 
     return Container(
       key: ObjectKey(item),
       height: 60,
-      color: isActive ? (highlightColor ?? Colors.blue.withOpacity(0.3)) : Colors.green,
+      decoration: decoration,
       child: Center(
         child: Text(
           item.s,
@@ -89,10 +104,12 @@ class TextItem extends AATexGroupItem implements ActiveableGroupItem {
   final String s;
   final bool _isActive;
   final Color? _highlightColor;
+  final BorderSide? _highlightBorder;
 
-  TextItem(this.s, {bool isActive = false, Color? highlightColor})
+  TextItem(this.s, {bool isActive = false, Color? highlightColor, BorderSide? highlightBorder})
     : _isActive = isActive,
-      _highlightColor = highlightColor;
+      _highlightColor = highlightColor,
+      _highlightBorder = highlightBorder;
 
   @override
   String get id => s;
@@ -104,7 +121,15 @@ class TextItem extends AATexGroupItem implements ActiveableGroupItem {
   Color? get highlightColor => _highlightColor;
 
   @override
-  TextItem copyWith({bool? isActive, Color? highlightColor}) {
-    return TextItem(s, isActive: isActive ?? _isActive, highlightColor: highlightColor ?? _highlightColor);
+  BorderSide? get highlightBorder => _highlightBorder;
+
+  @override
+  TextItem copyWith({bool? isActive, Color? highlightColor, BorderSide? highlightBorder}) {
+    return TextItem(
+      s,
+      isActive: isActive ?? _isActive,
+      highlightColor: highlightColor ?? _highlightColor,
+      highlightBorder: highlightBorder ?? _highlightBorder,
+    );
   }
 }

@@ -281,12 +281,14 @@ class AATexBoardController extends ChangeNotifier
   /// - [groupId]: The ID of the group/column containing the card
   /// - [itemId]: The ID of the card to highlight
   /// - [highlightColor]: Optional color for highlighting the card
+  /// - [highlightBorder]: Optional border for highlighting the card
   /// - [animationDuration]: Duration for scroll animation (defaults to 300ms)
   /// - [boardScrollController]: The scroll controller to use for scrolling to the card
   Future<bool> displayCard({
     required String groupId,
     required String itemId,
     Color? highlightColor,
+    BorderSide? highlightBorder,
     Duration animationDuration = const Duration(milliseconds: 300),
     AATexBoardScrollController? boardScrollController,
   }) async {
@@ -310,6 +312,60 @@ class AATexBoardController extends ChangeNotifier
       return false;
     }
     Log.debug('Found item at index $itemIndex in group "$groupId"');
+
+    // Reset active state for all cards in all groups
+    Log.debug('Resetting active state for all cards in all groups...');
+    int inactiveCardsCount = 0;
+    for (final controller in _groupControllers.values) {
+      for (var i = 0; i < controller.items.length; i++) {
+        final item = controller.items[i];
+        if (!item.isPhantom && item is AATexGroupItem) {
+          // Make item inactive by setting its property
+          if (item is ActiveableGroupItem) {
+            final updatedItem = (item as ActiveableGroupItem).copyWith(
+              isActive: false,
+              highlightColor: null,
+              highlightBorder: null,
+            );
+            controller.replace(i, updatedItem as AATexGroupItem);
+            inactiveCardsCount++;
+          }
+        }
+      }
+    }
+    Log.debug('Reset active state for $inactiveCardsCount cards');
+
+    // Get the target item and set it as active
+    Log.debug('Setting target card as active...');
+    final targetItem = groupController.items[itemIndex];
+    if (!targetItem.isPhantom && targetItem is AATexGroupItem) {
+      if (targetItem is ActiveableGroupItem) {
+        Log.debug('Target card implements ActiveableGroupItem interface');
+
+        // Use provided highlight border or default to 4px green border
+        final border = highlightBorder ??
+            const BorderSide(
+              color: Colors.green,
+              width: 4.0,
+            );
+
+        final updatedItem = (targetItem as ActiveableGroupItem).copyWith(
+          isActive: true,
+          highlightColor: highlightColor,
+          highlightBorder: border,
+        );
+        groupController.replace(itemIndex, updatedItem as AATexGroupItem);
+        Log.debug('Successfully set card as active with highlightBorder: ${border.toString()}');
+      } else {
+        Log.warn('Target card does not implement ActiveableGroupItem interface');
+      }
+    } else {
+      Log.warn('Target card is either a phantom or not an AATexGroupItem');
+    }
+
+    // Notify listeners to update UI
+    notifyListeners();
+    Log.debug('Notified listeners of card state changes');
 
     // Scroll to make the card visible if a scroll controller is provided
     try {

@@ -17,10 +17,14 @@ abstract class ActiveableGroupItem {
   /// Color used for highlighting this item when active
   Color? get highlightColor;
 
-  /// Creates a copy of this item with the specified active state and highlight color
+  /// Border used for highlighting this item when active
+  BorderSide? get highlightBorder;
+
+  /// Creates a copy of this item with the specified active state, highlight color and border
   ActiveableGroupItem copyWith({
     bool? isActive,
     Color? highlightColor,
+    BorderSide? highlightBorder,
   });
 }
 

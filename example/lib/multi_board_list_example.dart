@@ -146,16 +146,28 @@ class _MultiBoardListExampleState extends State<MultiBoardListExample> {
     // Check if the item is active
     final isActive = item is ActiveableGroupItem && (item as ActiveableGroupItem).isActive;
     final highlightColor = (item is ActiveableGroupItem) ? (item as ActiveableGroupItem).highlightColor : null;
+    final highlightBorder = (item is ActiveableGroupItem) ? (item as ActiveableGroupItem).highlightBorder : null;
 
-    // Apply highlight style if item is active
-    final decoration =
-        isActive
-            ? BoxDecoration(
-              color: highlightColor ?? Colors.blue.withOpacity(0.2),
-              border: Border.all(color: Colors.blue, width: 2),
-              borderRadius: BorderRadius.circular(4),
-            )
-            : null;
+    // Apply decoration with border if active
+    BoxDecoration? decoration;
+
+    if (isActive) {
+      if (highlightBorder != null) {
+        // Используем highlightBorder для создания рамки
+        decoration = BoxDecoration(
+          color: highlightColor,
+          border: Border(top: highlightBorder, left: highlightBorder, right: highlightBorder, bottom: highlightBorder),
+          borderRadius: BorderRadius.circular(4),
+        );
+      } else {
+        // Используем стандартную рамку, если highlightBorder не задан
+        decoration = BoxDecoration(
+          color: highlightColor ?? Colors.blue.withOpacity(0.2),
+          border: Border.all(color: Colors.blue, width: 2),
+          borderRadius: BorderRadius.circular(4),
+        );
+      }
+    }
 
     if (item is TextItem) {
       return Container(
@@ -211,12 +223,19 @@ class TextItem extends AATexGroupItem implements ActiveableGroupItem {
   final String s;
   final bool _isActive;
   final Color? _highlightColor;
+  final BorderSide? _highlightBorder;
 
-  TextItem({required String id, required String text, bool isActive = false, Color? highlightColor})
-    : _id = id,
-      s = text,
-      _isActive = isActive,
-      _highlightColor = highlightColor;
+  TextItem({
+    required String id,
+    required String text,
+    bool isActive = false,
+    Color? highlightColor,
+    BorderSide? highlightBorder,
+  }) : _id = id,
+       s = text,
+       _isActive = isActive,
+       _highlightColor = highlightColor,
+       _highlightBorder = highlightBorder;
 
   @override
   String get id => _id;
@@ -228,12 +247,16 @@ class TextItem extends AATexGroupItem implements ActiveableGroupItem {
   Color? get highlightColor => _highlightColor;
 
   @override
-  TextItem copyWith({bool? isActive, Color? highlightColor}) {
+  BorderSide? get highlightBorder => _highlightBorder;
+
+  @override
+  TextItem copyWith({bool? isActive, Color? highlightColor, BorderSide? highlightBorder}) {
     return TextItem(
       id: _id,
       text: s,
       isActive: isActive ?? _isActive,
       highlightColor: highlightColor ?? _highlightColor,
+      highlightBorder: highlightBorder ?? _highlightBorder,
     );
   }
 }
@@ -244,6 +267,7 @@ class RichTextItem extends AATexGroupItem implements ActiveableGroupItem {
   final String subtitle;
   final bool _isActive;
   final Color? _highlightColor;
+  final BorderSide? _highlightBorder;
 
   RichTextItem({
     required String id,
@@ -251,9 +275,11 @@ class RichTextItem extends AATexGroupItem implements ActiveableGroupItem {
     required this.subtitle,
     bool isActive = false,
     Color? highlightColor,
+    BorderSide? highlightBorder,
   }) : _id = id,
        _isActive = isActive,
-       _highlightColor = highlightColor;
+       _highlightColor = highlightColor,
+       _highlightBorder = highlightBorder;
 
   @override
   String get id => _id;
@@ -265,13 +291,17 @@ class RichTextItem extends AATexGroupItem implements ActiveableGroupItem {
   Color? get highlightColor => _highlightColor;
 
   @override
-  RichTextItem copyWith({bool? isActive, Color? highlightColor}) {
+  BorderSide? get highlightBorder => _highlightBorder;
+
+  @override
+  RichTextItem copyWith({bool? isActive, Color? highlightColor, BorderSide? highlightBorder}) {
     return RichTextItem(
       id: _id,
       title: title,
       subtitle: subtitle,
       isActive: isActive ?? _isActive,
       highlightColor: highlightColor ?? _highlightColor,
+      highlightBorder: highlightBorder ?? _highlightBorder,
     );
   }
 }
