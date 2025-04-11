@@ -1,8 +1,8 @@
 name: aatex_board
 description: AATex kanban board.
-version: 0.0.1+1
-homepage: https://github.com/AppFlowy-IO/appflowy-board
-repository: https://github.com/AppFlowy-IO/appflowy-board
+version: 0.0.1
+homepage: https://github.com/awaik/aatex-kanban
+repository: https://github.com/awaik/aatex-kanban
 
 environment:
   sdk: ">=3.3.0 <4.0.0"
