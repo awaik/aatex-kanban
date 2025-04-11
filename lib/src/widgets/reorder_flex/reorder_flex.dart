@@ -254,7 +254,9 @@ class ReorderFlexState extends State<ReorderFlex> with ReorderFlexMixin, TickerP
 
   @override
   void dispose() {
+    _notifier.dispose();
     _animation.dispose();
+    _autoScroller?.stopAutoScroll();
     super.dispose();
   }
 

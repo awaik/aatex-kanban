@@ -239,9 +239,12 @@ class _ReorderDragTargetState<T extends DragTargetData> extends State<ReorderDra
         color: Colors.transparent,
         borderRadius: BorderRadius.zero,
         clipBehavior: Clip.hardEdge,
-        child: ConstrainedBox(
-          constraints: constraints,
-          child: Opacity(opacity: widget.draggingOpacity, child: child),
+        // Using RepaintBoundary to isolate the feedback widget's repainting
+        child: RepaintBoundary(
+          child: ConstrainedBox(
+            constraints: constraints,
+            child: Opacity(opacity: widget.draggingOpacity, child: child),
+          ),
         ),
       ),
     );

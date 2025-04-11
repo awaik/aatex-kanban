@@ -28,7 +28,7 @@ mixin ReorderFlexMixin {
         child: SizeTransition(
           sizeFactor: sizeFactor,
           axis: direction,
-          child: FadeTransition(opacity: animationController, child: child),
+          child: FadeTransition(opacity: animationController.drive(CurveTween(curve: Curves.easeInOut)), child: child),
         ),
       );
     }
@@ -57,7 +57,7 @@ mixin ReorderFlexMixin {
         child: SizeTransition(
           sizeFactor: sizeFactor,
           axis: direction,
-          child: FadeTransition(opacity: animationController, child: child),
+          child: FadeTransition(opacity: animationController.drive(CurveTween(curve: Curves.easeInOut)), child: child),
         ),
       );
     }
@@ -75,7 +75,7 @@ extension CurveAnimationController on AnimationController {
 }
 
 class ReorderFlexNotifier extends DragTargetMovePlaceholderDelegate {
-  Map<int, DragTargetEventNotifier> dragTargeEventNotifier = {};
+  final Map<int, DragTargetEventNotifier> dragTargeEventNotifier = {};
 
   void updateDragTargetIndex(int index) {
     for (final notifier in dragTargeEventNotifier.values) {
@@ -98,6 +98,7 @@ class ReorderFlexNotifier extends DragTargetMovePlaceholderDelegate {
     for (final notifier in dragTargeEventNotifier.values) {
       notifier.dispose();
     }
+    dragTargeEventNotifier.clear();
   }
 
   @override
@@ -112,7 +113,8 @@ class ReorderFlexNotifier extends DragTargetMovePlaceholderDelegate {
 
   @override
   void unregisterPlaceholder(int dragTargetIndex) {
-    dragTargeEventNotifier.remove(dragTargetIndex);
+    final notifier = dragTargeEventNotifier.remove(dragTargetIndex);
+    notifier?.dispose();
   }
 }
 

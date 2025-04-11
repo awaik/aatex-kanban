@@ -97,8 +97,7 @@ class BoardPhantomController extends OverlapDragTargetDelegate implements CrossR
         item,
       );
 
-      // Log.debug(
-      //     "[$BoardPhantomController] did move ${phantomRecord.toString()}");
+      Log.debug("[$BoardPhantomController] did move ${phantomRecord.toString()}");
       phantomRecord = null;
     }
   }
@@ -213,12 +212,28 @@ class BoardPhantomController extends OverlapDragTargetDelegate implements CrossR
     FlexDragTargetData dragTargetData,
     int dragTargetIndex,
   ) {
+    // Memoizing the current reorderFlexId to avoid redundant operations
+    if (_lastReorderFlexId == reorderFlexId &&
+        _lastDragTargetIndex == dragTargetIndex &&
+        dragTargetData.reorderFlexId == _lastSourceFlexId) {
+      return;
+    }
+
+    _lastReorderFlexId = reorderFlexId;
+    _lastDragTargetIndex = dragTargetIndex;
+    _lastSourceFlexId = dragTargetData.reorderFlexId;
+
     acceptNewDragTargetData(
       reorderFlexId,
       dragTargetData,
       dragTargetIndex,
     );
   }
+
+  // Memoization variables to reduce redundant operations
+  String? _lastReorderFlexId;
+  int? _lastDragTargetIndex;
+  String? _lastSourceFlexId;
 
   @override
   int getInsertedIndex(String dragTargetId) {
