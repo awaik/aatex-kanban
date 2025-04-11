@@ -27,6 +27,7 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
+    print('+++++++1+++++++');
     return MaterialApp(
       home: Scaffold(
         appBar: AppBar(title: const Text('AATex Board')),

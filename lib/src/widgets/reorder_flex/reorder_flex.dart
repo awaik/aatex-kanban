@@ -684,10 +684,19 @@ class ReorderFlexState extends State<ReorderFlex> with ReorderFlexMixin, TickerP
           duration: const Duration(milliseconds: 400),
         )
             .then((value) {
-          setState(() {
+          // Проверяем, что виджет все еще смонтирован перед вызовом setState
+          if (mounted) {
+            setState(() {
+              _scrolling = false;
+              if (mounted) {
+                // Двойная проверка для большей безопасности
+                completed?.call(context);
+              }
+            });
+          } else {
+            // Если виджет уже размонтирован, просто сбрасываем состояние без вызова setState
             _scrolling = false;
-            completed?.call(context);
-          });
+          }
         });
       } else {
         completed?.call(context);
@@ -732,10 +741,19 @@ class ReorderFlexState extends State<ReorderFlex> with ReorderFlexMixin, TickerP
         duration: const Duration(milliseconds: 400),
       )
           .then((value) {
-        setState(() {
+        // Проверяем, что виджет все еще смонтирован перед вызовом setState
+        if (mounted) {
+          setState(() {
+            _scrolling = false;
+            if (mounted) {
+              // Двойная проверка для большей безопасности
+              completed?.call(context);
+            }
+          });
+        } else {
+          // Если виджет уже размонтирован, просто сбрасываем состояние без вызова setState
           _scrolling = false;
-          completed?.call(context);
-        });
+        }
       });
     } else {
       completed?.call(context);
@@ -775,7 +793,11 @@ class ReorderFlexState extends State<ReorderFlex> with ReorderFlexMixin, TickerP
           curve: Curves.easeInOut,
         )
             .then((void value) {
-          setState(() => _scrolling = false);
+          if (mounted) {
+            setState(() => _scrolling = false);
+          } else {
+            _scrolling = false;
+          }
         });
       }
     }

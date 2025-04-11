@@ -44,7 +44,7 @@ class _SingleBoardListExampleState extends State<SingleBoardListExample> {
         title: const Text('AATexBoard Example'),
         actions: [
           // Button to trigger highlighting card in column 8, item #43
-          IconButton(icon: const Icon(Icons.search), tooltip: 'Find card #43 in column 8', onPressed: _showCard),
+          ElevatedButton(onPressed: _showCard, child: const Text('Find card 8-43')),
         ],
       ),
       body: AATexBoard(

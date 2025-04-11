@@ -38,9 +38,20 @@ class _MultiBoardListExampleState extends State<MultiBoardListExample> {
 
         // Add a mix of TextItems and RichTextItems
         if (itemIndex % 5 == 0) {
-          items.add(RichTextItem(title: "Card $itemId", subtitle: 'April 11, 2025 - Item #$itemIndex'));
+          items.add(
+            RichTextItem(
+              id: itemId, // Use direct itemId
+              title: "Card $itemIndex",
+              subtitle: 'April 11, 2025 - Item #$itemIndex',
+            ),
+          );
         } else {
-          items.add(TextItem("Card $itemId"));
+          items.add(
+            TextItem(
+              id: itemId, // Use direct itemId
+              text: "Card $itemIndex",
+            ),
+          );
         }
       }
 
@@ -51,8 +62,29 @@ class _MultiBoardListExampleState extends State<MultiBoardListExample> {
   }
 
   void _showCard() {
-    // Display card #43 in column 8
-    controller.displayCard(groupId: "column_8", itemId: "item_8_43", highlightColor: Colors.amber.withOpacity(0.5));
+    print('====== SHOW CARD BUTTON PRESSED ======');
+    print('Attempting to display card #43 in column 8');
+
+    try {
+      // Display card #43 in column 8
+      controller
+          .displayCard(
+            groupId: "column_8",
+            itemId: "item_8_43",
+            highlightColor: Colors.amber.withOpacity(0.5),
+            boardScrollController: boardController, // Pass the scroll controller
+          )
+          .then((success) {
+            print('displayCard completed with result: $success');
+          })
+          .catchError((error) {
+            print('Error in displayCard: $error');
+            print('Stack trace: ${StackTrace.current}');
+          });
+    } catch (e) {
+      print('Exception while calling displayCard: $e');
+      print('Stack trace: ${StackTrace.current}');
+    }
   }
 
   @override
@@ -66,7 +98,7 @@ class _MultiBoardListExampleState extends State<MultiBoardListExample> {
         title: const Text('Multi-Column Board Example'),
         actions: [
           // Button to find and highlight card #43 in column 8
-          IconButton(icon: const Icon(Icons.search), tooltip: 'Find card #43 in column 8', onPressed: _showCard),
+          ElevatedButton(onPressed: _showCard, child: const Text('Find card 8-43')),
         ],
       ),
       body: AATexBoard(
@@ -175,16 +207,19 @@ class _RichTextCardState extends State<RichTextCard> {
 }
 
 class TextItem extends AATexGroupItem implements ActiveableGroupItem {
+  final String _id;
   final String s;
   final bool _isActive;
   final Color? _highlightColor;
 
-  TextItem(this.s, {bool isActive = false, Color? highlightColor})
-    : _isActive = isActive,
+  TextItem({required String id, required String text, bool isActive = false, Color? highlightColor})
+    : _id = id,
+      s = text,
+      _isActive = isActive,
       _highlightColor = highlightColor;
 
   @override
-  String get id => s;
+  String get id => _id;
 
   @override
   bool get isActive => _isActive;
@@ -194,22 +229,34 @@ class TextItem extends AATexGroupItem implements ActiveableGroupItem {
 
   @override
   TextItem copyWith({bool? isActive, Color? highlightColor}) {
-    return TextItem(s, isActive: isActive ?? _isActive, highlightColor: highlightColor ?? _highlightColor);
+    return TextItem(
+      id: _id,
+      text: s,
+      isActive: isActive ?? _isActive,
+      highlightColor: highlightColor ?? _highlightColor,
+    );
   }
 }
 
 class RichTextItem extends AATexGroupItem implements ActiveableGroupItem {
+  final String _id;
   final String title;
   final String subtitle;
   final bool _isActive;
   final Color? _highlightColor;
 
-  RichTextItem({required this.title, required this.subtitle, bool isActive = false, Color? highlightColor})
-    : _isActive = isActive,
-      _highlightColor = highlightColor;
+  RichTextItem({
+    required String id,
+    required this.title,
+    required this.subtitle,
+    bool isActive = false,
+    Color? highlightColor,
+  }) : _id = id,
+       _isActive = isActive,
+       _highlightColor = highlightColor;
 
   @override
-  String get id => title;
+  String get id => _id;
 
   @override
   bool get isActive => _isActive;
@@ -220,6 +267,7 @@ class RichTextItem extends AATexGroupItem implements ActiveableGroupItem {
   @override
   RichTextItem copyWith({bool? isActive, Color? highlightColor}) {
     return RichTextItem(
+      id: _id,
       title: title,
       subtitle: subtitle,
       isActive: isActive ?? _isActive,

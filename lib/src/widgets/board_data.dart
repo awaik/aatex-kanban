@@ -7,6 +7,7 @@ import 'package:flutter/widgets.dart';
 import 'package:equatable/equatable.dart';
 
 import 'package:aatex_board/src/widgets/board_group/group_data.dart';
+import 'package:aatex_board/src/widgets/board.dart';
 
 import '../utils/log.dart';
 
@@ -281,92 +282,64 @@ class AATexBoardController extends ChangeNotifier
   /// - [itemId]: The ID of the card to highlight
   /// - [highlightColor]: Optional color for highlighting the card
   /// - [animationDuration]: Duration for scroll animation (defaults to 300ms)
+  /// - [boardScrollController]: The scroll controller to use for scrolling to the card
   Future<bool> displayCard({
     required String groupId,
     required String itemId,
     Color? highlightColor,
     Duration animationDuration = const Duration(milliseconds: 300),
+    AATexBoardScrollController? boardScrollController,
   }) async {
+    Log.debug('====== START DISPLAY CARD ======');
+    Log.debug('Attempting to display card: groupId=$groupId, itemId=$itemId');
+
     // Find the group controller
     final groupController = getGroupController(groupId);
     if (groupController == null) {
       Log.warn('Cannot display card: Group with ID "$groupId" not found');
+      Log.debug('====== END DISPLAY CARD (FAILED) ======');
       return false;
     }
+    Log.debug('Found group controller for "$groupId"');
 
     // Find the item index
     final itemIndex = groupController.items.indexWhere((item) => item.id == itemId);
     if (itemIndex == -1) {
       Log.warn('Cannot display card: Item with ID "$itemId" not found in group "$groupId"');
+      Log.debug('====== END DISPLAY CARD (FAILED) ======');
       return false;
     }
+    Log.debug('Found item at index $itemIndex in group "$groupId"');
 
-    // Reset active state for all cards in all groups
-    for (final controller in _groupControllers.values) {
-      for (var i = 0; i < controller.items.length; i++) {
-        final item = controller.items[i];
-        if (!item.isPhantom && item is AATexGroupItem) {
-          // Make item inactive by setting its property
-          // We need to create a new item with the updated property
-          // since items might be immutable
-          if (item is ActiveableGroupItem) {
-            final updatedItem = (item as ActiveableGroupItem).copyWith(isActive: false);
-            controller.replace(i, updatedItem as AATexGroupItem);
-          }
-        }
-      }
-    }
+    // Убрана часть с выделением карточек, теперь просто прокручиваем к нужной карточке
 
-    // Get the target item and set it as active
-    final targetItem = groupController.items[itemIndex];
-    if (!targetItem.isPhantom && targetItem is AATexGroupItem) {
-      if (targetItem is ActiveableGroupItem) {
-        final updatedItem = (targetItem as ActiveableGroupItem).copyWith(
-          isActive: true,
-          highlightColor: highlightColor,
-        );
-        groupController.replace(itemIndex, updatedItem as AATexGroupItem);
-      }
-    }
-
-    // Notify listeners to update UI
-    notifyListeners();
-
-    // The scrolling implementation depends on how the board UI is constructed
+    // Scroll to make the card visible if a scroll controller is provided
     try {
-      // Store the group index for horizontal scrolling calculations
-      final groupIndex = _groupDatas.indexWhere((group) => group.id == groupId);
-      if (groupIndex == -1) {
-        Log.warn('Cannot find group index for scrolling to group "$groupId"');
+      if (boardScrollController != null) {
+        Log.debug('Scroll controller provided, attempting to scroll to item...');
+        // First, scroll to the item in the group
+        boardScrollController.scrollToItem(
+          groupId,
+          itemIndex,
+          // Optional callback when scrolling completes
+          completed: (context) {
+            Log.debug('Scroll completed - item $itemId in group $groupId is now visible');
+          },
+        );
+        Log.debug('Scroll command issued successfully');
+        Log.debug('====== END DISPLAY CARD (SUCCESS) ======');
+        return true;
+      } else {
+        Log.warn('Cannot scroll to card: No board scroll controller provided');
+        Log.debug('No scrolling performed (no controller)');
+        Log.debug('====== END DISPLAY CARD (PARTIAL SUCCESS) ======');
         return false;
       }
-
-      // Use the groupIndex for scroll calculations when implementing scroll controllers
-      // Example (actual implementation depends on your UI structure):
-      //
-      // For horizontal scrolling to the group/column:
-      // if (boardScrollController != null) {
-      //   final groupOffset = groupIndex * estimatedGroupWidth;
-      //   await boardScrollController.animateTo(
-      //     groupOffset,
-      //     duration: animationDuration,
-      //     curve: Curves.easeInOut,
-      //   );
-      // }
-      //
-      // For vertical scrolling to the item within the group:
-      // if (groupController.scrollController != null) {
-      //   final itemOffset = itemIndex * estimatedItemHeight;
-      //   await groupController.scrollController.animateTo(
-      //     itemOffset,
-      //     duration: animationDuration,
-      //     curve: Curves.easeInOut,
-      //   );
-      // }
-
-      return true;
     } catch (e) {
       Log.error('Error scrolling to display card: $e');
+      Log.debug('Stack trace: ${StackTrace.current}');
+      Log.debug('Scrolling failed');
+      Log.debug('====== END DISPLAY CARD (FAILURE) ======');
       return false;
     }
   }
