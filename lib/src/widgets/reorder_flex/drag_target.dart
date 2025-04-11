@@ -101,7 +101,8 @@ class ReorderDragTarget<T extends DragTargetData> extends StatefulWidget {
   State<ReorderDragTarget<T>> createState() => _ReorderDragTargetState<T>();
 }
 
-class _ReorderDragTargetState<T extends DragTargetData> extends State<ReorderDragTarget<T>> {
+class _ReorderDragTargetState<T extends DragTargetData>
+    extends State<ReorderDragTarget<T>> {
   /// the dragTarget's size
   Size? _draggingFeedbackSize = Size.zero;
 
@@ -109,8 +110,10 @@ class _ReorderDragTargetState<T extends DragTargetData> extends State<ReorderDra
   Widget build(BuildContext context) {
     Widget dragTarget = DragTarget<T>(
       builder: _buildDraggableWidget,
-      onWillAcceptWithDetails: (details) => widget.onWillAcceptWithDetails(details.data),
-      onAcceptWithDetails: (details) => widget.onAccceptWithDetails?.call(details.data),
+      onWillAcceptWithDetails: (details) =>
+          widget.onWillAcceptWithDetails(details.data),
+      onAcceptWithDetails: (details) =>
+          widget.onAccceptWithDetails?.call(details.data),
       onMove: (detail) {
         widget.onDragMoved(detail.data, detail.offset);
       },
@@ -133,7 +136,8 @@ class _ReorderDragTargetState<T extends DragTargetData> extends State<ReorderDra
   ) {
     final feedbackBuilder = Builder(
       builder: (BuildContext context) {
-        final BoxConstraints contentSizeConstraints = BoxConstraints.loose(_draggingFeedbackSize!);
+        final BoxConstraints contentSizeConstraints =
+            BoxConstraints.loose(_draggingFeedbackSize!);
         return _buildDraggableFeedback(
           context,
           contentSizeConstraints,
@@ -169,7 +173,8 @@ class _ReorderDragTargetState<T extends DragTargetData> extends State<ReorderDra
               child: widget.child,
             ),
             onDragStarted: () {
-              _draggingFeedbackSize = widget.indexGlobalKey.currentContext?.size;
+              _draggingFeedbackSize =
+                  widget.indexGlobalKey.currentContext?.size;
               widget.onDragStarted(
                 widget.child,
                 widget.dragTargetData.draggingIndex,
@@ -184,7 +189,8 @@ class _ReorderDragTargetState<T extends DragTargetData> extends State<ReorderDra
             /// When the drag does not end inside a DragTarget widget, the
             /// drag fails, but we still reorder the widget to the last position it
             /// had been dragged to.
-            onDraggableCanceled: (_, __) => widget.onDragEnded(widget.dragTargetData),
+            onDraggableCanceled: (_, __) =>
+                widget.onDragEnded(widget.dragTargetData),
             child: widget.child,
           ),
         );
@@ -218,7 +224,8 @@ class _ReorderDragTargetState<T extends DragTargetData> extends State<ReorderDra
           /// When the drag does not end inside a DragTarget widget, the
           /// drag fails, but we still reorder the widget to the last position it
           /// had been dragged to.
-          onDraggableCanceled: (_, __) => widget.onDragEnded(widget.dragTargetData),
+          onDraggableCanceled: (_, __) =>
+              widget.onDragEnded(widget.dragTargetData),
           child: widget.child,
         ),
       );
@@ -334,7 +341,9 @@ class IgnorePointerWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final sizedChild = useIntrinsicSize ? child : SizedBox(width: 0.0, height: 0.0, child: child);
+    final sizedChild = useIntrinsicSize
+        ? child
+        : SizedBox(width: 0.0, height: 0.0, child: child);
 
     return IgnorePointer(
       child: Opacity(
@@ -359,7 +368,9 @@ class AbsorbPointerWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final sizedChild = useIntrinsicSize ? child : SizedBox(width: 0.0, height: 0.0, child: child);
+    final sizedChild = useIntrinsicSize
+        ? child
+        : SizedBox(width: 0.0, height: 0.0, child: child);
 
     return AbsorbPointer(
       child: Opacity(
@@ -428,7 +439,8 @@ class FakeDragTarget<T extends DragTargetData> extends StatefulWidget {
   State<FakeDragTarget<T>> createState() => _FakeDragTargetState<T>();
 }
 
-class _FakeDragTargetState<T extends DragTargetData> extends State<FakeDragTarget<T>>
+class _FakeDragTargetState<T extends DragTargetData>
+    extends State<FakeDragTarget<T>>
     with TickerProviderStateMixin<FakeDragTarget<T>> {
   bool simulateDragging = false;
 
@@ -453,7 +465,8 @@ class _FakeDragTargetState<T extends DragTargetData> extends State<FakeDragTarge
 
   @override
   void dispose() {
-    widget.insertAnimationController.removeStatusListener(_onInsertedAnimationStatusChanged);
+    widget.insertAnimationController
+        .removeStatusListener(_onInsertedAnimationStatusChanged);
     super.dispose();
   }
 

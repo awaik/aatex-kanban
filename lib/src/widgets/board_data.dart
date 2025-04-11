@@ -2,7 +2,6 @@ import 'dart:collection';
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 
 import 'package:equatable/equatable.dart';
 
@@ -91,12 +90,15 @@ class AATexBoardController extends ChangeNotifier
   final bool enableCrossGroupAnimation;
 
   /// Returns the unmodifiable list of [AATexGroupData]
-  UnmodifiableListView<AATexGroupData> get groupDatas => UnmodifiableListView(_groupDatas);
+  UnmodifiableListView<AATexGroupData> get groupDatas =>
+      UnmodifiableListView(_groupDatas);
 
   /// Returns list of group id
-  List<String> get groupIds => _groupDatas.map((groupData) => groupData.id).toList();
+  List<String> get groupIds =>
+      _groupDatas.map((groupData) => groupData.id).toList();
 
-  final LinkedHashMap<String, AATexGroupController> _groupControllers = LinkedHashMap();
+  final LinkedHashMap<String, AATexGroupController> _groupControllers =
+      LinkedHashMap();
 
   /// Adds a new group to the end of the current group list.
   ///
@@ -214,7 +216,8 @@ class AATexBoardController extends ChangeNotifier
   /// If the group with id [groupId] is not exist, this method will do nothing.
   ///
   /// Returns true if the move was successful, false otherwise.
-  Future<bool> moveGroupItem<T>(String groupId, int fromIndex, int toIndex, T item) async {
+  Future<bool> moveGroupItem<T>(
+      String groupId, int fromIndex, int toIndex, T item) async {
     // Validate indexes to prevent out-of-range errors
     final controller = getGroupController(groupId);
     if (controller == null) {
@@ -224,12 +227,14 @@ class AATexBoardController extends ChangeNotifier
 
     // Validate index bounds
     if (fromIndex < 0 || fromIndex >= controller.items.length) {
-      Log.warn('Cannot move item: fromIndex ($fromIndex) out of bounds [0..${controller.items.length - 1}]');
+      Log.warn(
+          'Cannot move item: fromIndex ($fromIndex) out of bounds [0..${controller.items.length - 1}]');
       return false;
     }
 
     if (toIndex < 0 || toIndex >= controller.items.length) {
-      Log.warn('Cannot move item: toIndex ($toIndex) out of bounds [0..${controller.items.length - 1}]');
+      Log.warn(
+          'Cannot move item: toIndex ($toIndex) out of bounds [0..${controller.items.length - 1}]');
       return false;
     }
 
@@ -313,7 +318,8 @@ class AATexBoardController extends ChangeNotifier
       }
 
       // Get animation duration (use item-specific if available, otherwise default)
-      final animDuration = fromGroupItem.crossGroupAnimationDuration ?? crossGroupAnimationDuration;
+      final animDuration = fromGroupItem.crossGroupAnimationDuration ??
+          crossGroupAnimationDuration;
 
       if (shouldAnimate) {
         // Apply animation and make move after animation completes
@@ -351,14 +357,12 @@ class AATexBoardController extends ChangeNotifier
   /// - [itemId]: The ID of the card to highlight
   /// - [highlightColor]: Optional color for highlighting the card
   /// - [highlightBorder]: Optional border for highlighting the card
-  /// - [animationDuration]: Duration for scroll animation (defaults to 300ms)
   /// - [boardScrollController]: The scroll controller to use for scrolling to the card
   Future<bool> displayCard({
     required String groupId,
     required String itemId,
     Color? highlightColor,
     BorderSide? highlightBorder,
-    Duration animationDuration = const Duration(milliseconds: 300),
     AATexBoardScrollController? boardScrollController,
   }) async {
     Log.debug('====== START DISPLAY CARD ======');
@@ -374,9 +378,11 @@ class AATexBoardController extends ChangeNotifier
     Log.debug('Found group controller for "$groupId"');
 
     // Find the item index
-    final itemIndex = groupController.items.indexWhere((item) => item.id == itemId);
+    final itemIndex =
+        groupController.items.indexWhere((item) => item.id == itemId);
     if (itemIndex == -1) {
-      Log.warn('Cannot display card: Item with ID "$itemId" not found in group "$groupId"');
+      Log.warn(
+          'Cannot display card: Item with ID "$itemId" not found in group "$groupId"');
       Log.debug('====== END DISPLAY CARD (FAILED) ======');
       return false;
     }
@@ -424,9 +430,11 @@ class AATexBoardController extends ChangeNotifier
           highlightBorder: border,
         );
         groupController.replace(itemIndex, updatedItem as AATexGroupItem);
-        Log.debug('Successfully set card as active with highlightBorder: ${border.toString()}');
+        Log.debug(
+            'Successfully set card as active with highlightBorder: ${border.toString()}');
       } else {
-        Log.warn('Target card does not implement ActiveableGroupItem interface');
+        Log.warn(
+            'Target card does not implement ActiveableGroupItem interface');
       }
     } else {
       Log.warn('Target card is either a phantom or not an AATexGroupItem');
@@ -439,7 +447,8 @@ class AATexBoardController extends ChangeNotifier
     // Scroll to make the card visible if a scroll controller is provided
     try {
       if (boardScrollController != null) {
-        Log.debug('Scroll controller provided, attempting to scroll to group and item...');
+        Log.debug(
+            'Scroll controller provided, attempting to scroll to group and item...');
 
         // Создаем Completer для ожидания завершения прокрутки
         final completer = Completer<bool>();
@@ -449,14 +458,16 @@ class AATexBoardController extends ChangeNotifier
         boardScrollController.scrollToGroup(
           groupId,
           completed: (context) {
-            Log.debug('Horizontal scroll completed, now scrolling to specific item...');
+            Log.debug(
+                'Horizontal scroll completed, now scrolling to specific item...');
 
             // Затем прокручиваем к элементу в колонке вертикально
             boardScrollController.scrollToItem(
               groupId,
               itemIndex,
               completed: (context) {
-                Log.debug('Vertical scroll completed - item $itemId in group $groupId is now visible');
+                Log.debug(
+                    'Vertical scroll completed - item $itemId in group $groupId is now visible');
                 completer.complete(true);
               },
             );
@@ -484,13 +495,15 @@ class AATexBoardController extends ChangeNotifier
   List<Object?> get props => [_groupDatas];
 
   @override
-  AATexGroupController? controller(String groupId) => _groupControllers[groupId];
+  AATexGroupController? controller(String groupId) =>
+      _groupControllers[groupId];
 
   @override
   String get identifier => '$AATexBoardController';
 
   @override
-  UnmodifiableListView<ReorderFlexItem> get items => UnmodifiableListView(_groupDatas);
+  UnmodifiableListView<ReorderFlexItem> get items =>
+      UnmodifiableListView(_groupDatas);
 
   @override
   @protected

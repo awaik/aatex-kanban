@@ -64,7 +64,8 @@ class AATexGroupController extends ChangeNotifier with EquatableMixin {
   List<Object?> get props => groupData.props;
 
   /// Returns the readonly List<AATexGroupItem>
-  UnmodifiableListView<AATexGroupItem> get items => UnmodifiableListView(groupData.items);
+  UnmodifiableListView<AATexGroupItem> get items =>
+      UnmodifiableListView(groupData.items);
 
   void updateGroupName(String newName) {
     if (groupData.headerData.groupName != newName) {
@@ -198,7 +199,8 @@ class AATexGroupController extends ChangeNotifier with EquatableMixin {
   }
 
   bool _containsItem(AATexGroupItem item) {
-    return groupData._items.indexWhere((element) => element.id == item.id) != -1;
+    return groupData._items.indexWhere((element) => element.id == item.id) !=
+        -1;
   }
 
   void enableDragging(bool isEnable) {
@@ -235,7 +237,8 @@ class AATexGroupData<T> extends ReorderFlexItem with EquatableMixin {
   final List<AATexGroupItem> _items;
 
   /// Returns the readonly List<AATexGroupItem>
-  UnmodifiableListView<AATexGroupItem> get items => UnmodifiableListView([..._items]);
+  UnmodifiableListView<AATexGroupItem> get items =>
+      UnmodifiableListView([..._items]);
 
   @override
   List<Object?> get props => [id, ..._items];

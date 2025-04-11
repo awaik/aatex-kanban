@@ -16,12 +16,18 @@ import 'reorder_phantom/phantom_controller.dart';
 class AATexBoardScrollController {
   AATexBoardState? _boardState;
 
+  /// Sets the board state - used internally by AATexBoard
+  void setBoardState(AATexBoardState state) {
+    _boardState = state;
+  }
+
   /// Scrolls the board horizontally to make the specified group visible, preferably in the center
   void scrollToGroup(
     String groupId, {
     void Function(BuildContext)? completed,
   }) {
-    Log.debug('[scrollToGroup] START - attempting to scroll to groupId=$groupId');
+    Log.debug(
+        '[scrollToGroup] START - attempting to scroll to groupId=$groupId');
 
     if (_boardState == null) {
       Log.warn('[scrollToGroup] _boardState is null');
@@ -36,7 +42,8 @@ class AATexBoardScrollController {
 
     // Ищем ключ для колонки непосредственно среди ключей, а не их содержимого
     final columnKeys = _boardState!.groupDragTargetKeys.keys.toList();
-    Log.debug('[scrollToGroup] Available column keys: ${columnKeys.join(', ')}');
+    Log.debug(
+        '[scrollToGroup] Available column keys: ${columnKeys.join(', ')}');
 
     // Получаем контекст родительского контейнера этой колонки через элемент в этой колонке
     BuildContext? targetContext;
@@ -57,12 +64,15 @@ class AATexBoardScrollController {
 
     // Если не нашли контекст в целевой колонке, ищем любой контекст для коллбэка
     if (targetContext == null) {
-      Log.warn('[scrollToGroup] No direct context found in target column, searching other columns...');
+      Log.warn(
+          '[scrollToGroup] No direct context found in target column, searching other columns...');
 
       // Попробуем найти колонку используя ValueKey
       for (final child in _boardState!._boardContentChildren) {
-        if (child.widget.key is ValueKey && (child.widget.key as ValueKey).value == groupId) {
-          Log.debug('[scrollToGroup] Found column widget with ValueKey=$groupId');
+        if (child.widget.key is ValueKey &&
+            (child.widget.key as ValueKey).value == groupId) {
+          Log.debug(
+              '[scrollToGroup] Found column widget with ValueKey=$groupId');
           if (child is StatefulElement || child is StatelessElement) {
             targetContext = child;
             break;
@@ -74,7 +84,8 @@ class AATexBoardScrollController {
       if (targetContext == null) {
         targetContext = _getAnyAvailableContext();
         if (targetContext == null) {
-          Log.error('[scrollToGroup] No valid context found for callback, aborting');
+          Log.error(
+              '[scrollToGroup] No valid context found for callback, aborting');
           return;
         }
       }
@@ -83,7 +94,8 @@ class AATexBoardScrollController {
     // Находим виджет колонки через родительский контекст
     Element? columnElement;
     targetContext!.visitAncestorElements((element) {
-      if (element.widget.key is ValueKey && (element.widget.key as ValueKey).value == groupId) {
+      if (element.widget.key is ValueKey &&
+          (element.widget.key as ValueKey).value == groupId) {
         columnElement = element;
         return false; // прекращаем поиск
       }
@@ -91,10 +103,12 @@ class AATexBoardScrollController {
     });
 
     if (columnElement == null) {
-      Log.warn('[scrollToGroup] Could not find column element with key=$groupId, searching by widget type');
+      Log.warn(
+          '[scrollToGroup] Could not find column element with key=$groupId, searching by widget type');
       // Если не нашли по ключу, пробуем найти по типу виджета и данным
       targetContext.visitAncestorElements((element) {
-        if (element.widget is ConstrainedBox && element.toString().contains(groupId)) {
+        if (element.widget is ConstrainedBox &&
+            element.toString().contains(groupId)) {
           columnElement = element;
           return false;
         }
@@ -103,7 +117,8 @@ class AATexBoardScrollController {
     }
 
     if (columnElement == null) {
-      Log.error('[scrollToGroup] Column element not found, falling back to child context');
+      Log.error(
+          '[scrollToGroup] Column element not found, falling back to child context');
       columnElement = targetContext as Element;
     }
 
@@ -122,25 +137,31 @@ class AATexBoardScrollController {
     final position = box.localToGlobal(Offset.zero);
 
     // Размеры и позиции
-    final screenWidth =
-        WidgetsBinding.instance.window.physicalSize.width / WidgetsBinding.instance.window.devicePixelRatio;
+    final screenWidth = WidgetsBinding.instance.window.physicalSize.width /
+        WidgetsBinding.instance.window.devicePixelRatio;
     final groupWidth = box.size.width;
-    Log.debug('[scrollToGroup] Group position: dx=${position.dx}, dy=${position.dy}');
-    Log.debug('[scrollToGroup] Screen width: $screenWidth, Group width: $groupWidth');
+    Log.debug(
+        '[scrollToGroup] Group position: dx=${position.dx}, dy=${position.dy}');
+    Log.debug(
+        '[scrollToGroup] Screen width: $screenWidth, Group width: $groupWidth');
 
     // Пытаемся центрировать колонку на экране
     final targetOffset = position.dx - (screenWidth / 2) + (groupWidth / 2);
-    Log.debug('[scrollToGroup] Current scroll position: ${scrollController.position.pixels}');
+    Log.debug(
+        '[scrollToGroup] Current scroll position: ${scrollController.position.pixels}');
     Log.debug('[scrollToGroup] Target offset before clamping: $targetOffset');
 
     // Убеждаемся, что не прокручиваем за пределы диапазона
-    final clampedOffset =
-        targetOffset.clamp(scrollController.position.minScrollExtent, scrollController.position.maxScrollExtent);
-    Log.debug('[scrollToGroup] Final clamped offset for scrolling: $clampedOffset');
+    final clampedOffset = targetOffset.clamp(
+        scrollController.position.minScrollExtent,
+        scrollController.position.maxScrollExtent);
+    Log.debug(
+        '[scrollToGroup] Final clamped offset for scrolling: $clampedOffset');
 
     // Если уже находимся на нужной позиции или очень близко, не прокручиваем
     if ((scrollController.position.pixels - clampedOffset).abs() < 5.0) {
-      Log.debug('[scrollToGroup] Already at target position, no need to scroll');
+      Log.debug(
+          '[scrollToGroup] Already at target position, no need to scroll');
       if (completed != null) {
         completed(targetContext);
       }
@@ -170,7 +191,8 @@ class AATexBoardScrollController {
         if (newContext != null) {
           completed(newContext);
         } else {
-          Log.warn('[scrollToGroup] Cannot call completed: no valid context available after animation');
+          Log.warn(
+              '[scrollToGroup] Cannot call completed: no valid context available after animation');
         }
       }
     }).catchError((error) {
@@ -181,7 +203,8 @@ class AATexBoardScrollController {
         if (errorContext != null) {
           completed(errorContext);
         } else {
-          Log.warn('[scrollToGroup] Cannot call completed after error: no valid context available');
+          Log.warn(
+              '[scrollToGroup] Cannot call completed after error: no valid context available');
         }
       }
     });
@@ -335,9 +358,7 @@ class AATexBoard extends StatelessWidget {
             groupsState: boardState,
           );
 
-          if (boardScrollController != null) {
-            boardScrollController!._boardState = boardState;
-          }
+          boardScrollController?.setBoardState(boardState);
 
           return _AATexBoardContent(
             config: config,
@@ -406,7 +427,8 @@ class _AATexBoardContent extends StatefulWidget {
 }
 
 class _AATexBoardContentState extends State<_AATexBoardContent> {
-  final GlobalKey _boardContentKey = GlobalKey(debugLabel: '$_AATexBoardContent overlay key');
+  final GlobalKey _boardContentKey =
+      GlobalKey(debugLabel: '$_AATexBoardContent overlay key');
   late BoardOverlayEntry _overlayEntry;
   late final _scrollController = widget.scrollController ?? ScrollController();
 
@@ -424,7 +446,8 @@ class _AATexBoardContentState extends State<_AATexBoardContent> {
             Container(
               clipBehavior: Clip.hardEdge,
               decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(widget.config.boardCornerRadius),
+                borderRadius:
+                    BorderRadius.circular(widget.config.boardCornerRadius),
               ),
               child: widget.background,
             ),
@@ -471,7 +494,8 @@ class _AATexBoardContentState extends State<_AATexBoardContent> {
     final List<Widget> children = [];
 
     // Создаем список виджетов колонок
-    final columnWidgets = widget.boardController.groupDatas.asMap().entries.map((item) {
+    final columnWidgets =
+        widget.boardController.groupDatas.asMap().entries.map((item) {
       final columnData = item.value;
       final columnIndex = item.key;
 
@@ -506,7 +530,8 @@ class _AATexBoardContentState extends State<_AATexBoardContent> {
               reorderFlexAction: reorderFlexAction,
               stretchGroupHeight: widget.config.stretchGroupHeight,
               onDragStarted: (index) {
-                widget.boardController.onStartDraggingCard?.call(columnData.id, index);
+                widget.boardController.onStartDraggingCard
+                    ?.call(columnData.id, index);
               },
             ),
           ),
@@ -540,11 +565,13 @@ class _AATexBoardContentState extends State<_AATexBoardContent> {
 
         if (element != null) {
           widget.boardState._boardContentChildren.add(element!);
-          Log.debug('[_buildColumns] Saved column element with key: ${columnData.id}');
+          Log.debug(
+              '[_buildColumns] Saved column element with key: ${columnData.id}');
         }
       }
 
-      Log.debug('[_buildColumns] Total column elements saved: ${widget.boardState._boardContentChildren.length}');
+      Log.debug(
+          '[_buildColumns] Total column elements saved: ${widget.boardState._boardContentChildren.length}');
     });
 
     return children;
@@ -589,13 +616,15 @@ class _BoardGroupDataSourceImpl extends AATexGroupDataDataSource {
   final AATexBoardController boardController;
 
   @override
-  AATexGroupData get groupData => boardController.getGroupController(groupId)!.groupData;
+  AATexGroupData get groupData =>
+      boardController.getGroupController(groupId)!.groupData;
 
   @override
   List<String> get acceptedGroupIds => boardController.groupIds;
 }
 
-class AATexBoardState extends DraggingStateStorage implements ReorderDragTargetKeys {
+class AATexBoardState extends DraggingStateStorage
+    implements ReorderDragTargetKeys {
   final Map<String, DraggingState> groupDragStates = {};
   final Map<String, Map<String, GlobalObjectKey>> groupDragTargetKeys = {};
 
@@ -610,7 +639,8 @@ class AATexBoardState extends DraggingStateStorage implements ReorderDragTargetK
   List<Element> _boardContentChildren = [];
 
   @override
-  DraggingState? readState(String reorderFlexId) => groupDragStates[reorderFlexId];
+  DraggingState? readState(String reorderFlexId) =>
+      groupDragStates[reorderFlexId];
 
   @override
   void insertState(String reorderFlexId, DraggingState state) {
@@ -642,7 +672,8 @@ class AATexBoardState extends DraggingStateStorage implements ReorderDragTargetK
     String reorderFlexId,
     String key,
   ) {
-    final Map<String, GlobalObjectKey>? group = groupDragTargetKeys[reorderFlexId];
+    final Map<String, GlobalObjectKey>? group =
+        groupDragTargetKeys[reorderFlexId];
     if (group != null) {
       return group[key];
     }

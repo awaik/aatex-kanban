@@ -16,8 +16,16 @@ class _MultiBoardListExampleState extends State<MultiBoardListExample> {
     onMoveGroupItem: <T>(groupId, fromIndex, toIndex, item) {
       debugPrint('Move $groupId:$fromIndex to $groupId:$toIndex - item $item');
     },
-    onMoveGroupItemToGroup: <T>(fromGroupId, fromIndex, toGroupId, toIndex, T item) {
-      debugPrint('Move $fromGroupId:$fromIndex to $toGroupId:$toIndex - item $item');
+    onMoveGroupItemToGroup: <T>(
+      fromGroupId,
+      fromIndex,
+      toGroupId,
+      toIndex,
+      T item,
+    ) {
+      debugPrint(
+        'Move $fromGroupId:$fromIndex to $toGroupId:$toIndex - item $item',
+      );
     },
   );
 
@@ -55,7 +63,11 @@ class _MultiBoardListExampleState extends State<MultiBoardListExample> {
         }
       }
 
-      final column = AATexGroupData(id: "column_$colIndex", name: "Col_$colIndex", items: items);
+      final column = AATexGroupData(
+        id: "column_$colIndex",
+        name: "Col_$colIndex",
+        items: items,
+      );
 
       controller.addGroup(column);
     }
@@ -72,7 +84,8 @@ class _MultiBoardListExampleState extends State<MultiBoardListExample> {
             groupId: "column_8",
             itemId: "item_8_43",
             highlightColor: Colors.amber.withOpacity(0.5),
-            boardScrollController: boardController, // Pass the scroll controller
+            boardScrollController:
+                boardController, // Pass the scroll controller
           )
           .then((success) {
             print('displayCard completed with result: $success');
@@ -98,13 +111,19 @@ class _MultiBoardListExampleState extends State<MultiBoardListExample> {
         title: const Text('Multi-Column Board Example'),
         actions: [
           // Button to find and highlight card #43 in column 8
-          ElevatedButton(onPressed: _showCard, child: const Text('Find card 8-43')),
+          ElevatedButton(
+            onPressed: _showCard,
+            child: const Text('Find card 8-43'),
+          ),
         ],
       ),
       body: AATexBoard(
         controller: controller,
         cardBuilder: (context, group, groupItem) {
-          return AATexGroupCard(key: ValueKey(groupItem.id), child: _buildCard(groupItem));
+          return AATexGroupCard(
+            key: ValueKey(groupItem.id),
+            child: _buildCard(groupItem),
+          );
         },
         boardScrollController: boardController,
         footerBuilder: (context, columnData) {
@@ -124,9 +143,13 @@ class _MultiBoardListExampleState extends State<MultiBoardListExample> {
             title: SizedBox(
               width: 60,
               child: TextField(
-                controller: TextEditingController()..text = columnData.headerData.groupName,
+                controller:
+                    TextEditingController()
+                      ..text = columnData.headerData.groupName,
                 onSubmitted: (val) {
-                  controller.getGroupController(columnData.headerData.groupId)!.updateGroupName(val);
+                  controller
+                      .getGroupController(columnData.headerData.groupId)!
+                      .updateGroupName(val);
                 },
               ),
             ),
@@ -144,9 +167,16 @@ class _MultiBoardListExampleState extends State<MultiBoardListExample> {
 
   Widget _buildCard(AATexGroupItem item) {
     // Check if the item is active
-    final isActive = item is ActiveableGroupItem && (item as ActiveableGroupItem).isActive;
-    final highlightColor = (item is ActiveableGroupItem) ? (item as ActiveableGroupItem).highlightColor : null;
-    final highlightBorder = (item is ActiveableGroupItem) ? (item as ActiveableGroupItem).highlightBorder : null;
+    final isActive =
+        item is ActiveableGroupItem && (item as ActiveableGroupItem).isActive;
+    final highlightColor =
+        (item is ActiveableGroupItem)
+            ? (item as ActiveableGroupItem).highlightColor
+            : null;
+    final highlightBorder =
+        (item is ActiveableGroupItem)
+            ? (item as ActiveableGroupItem).highlightBorder
+            : null;
 
     // Apply decoration with border if active
     BoxDecoration? decoration;
@@ -156,7 +186,12 @@ class _MultiBoardListExampleState extends State<MultiBoardListExample> {
         // Используем highlightBorder для создания рамки
         decoration = BoxDecoration(
           color: highlightColor,
-          border: Border(top: highlightBorder, left: highlightBorder, right: highlightBorder, bottom: highlightBorder),
+          border: Border(
+            top: highlightBorder,
+            left: highlightBorder,
+            right: highlightBorder,
+            bottom: highlightBorder,
+          ),
           borderRadius: BorderRadius.circular(4),
         );
       } else {
@@ -176,7 +211,12 @@ class _MultiBoardListExampleState extends State<MultiBoardListExample> {
           alignment: Alignment.centerLeft,
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 30),
-            child: Text(item.s, style: TextStyle(fontWeight: isActive ? FontWeight.bold : FontWeight.normal)),
+            child: Text(
+              item.s,
+              style: TextStyle(
+                fontWeight: isActive ? FontWeight.bold : FontWeight.normal,
+              ),
+            ),
           ),
         ),
       );
@@ -208,9 +248,16 @@ class _RichTextCardState extends State<RichTextCard> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(widget.item.title, style: const TextStyle(fontSize: 14), textAlign: TextAlign.left),
+            Text(
+              widget.item.title,
+              style: const TextStyle(fontSize: 14),
+              textAlign: TextAlign.left,
+            ),
             const SizedBox(height: 10),
-            Text(widget.item.subtitle, style: const TextStyle(fontSize: 12, color: Colors.grey)),
+            Text(
+              widget.item.subtitle,
+              style: const TextStyle(fontSize: 12, color: Colors.grey),
+            ),
           ],
         ),
       ),
@@ -250,7 +297,11 @@ class TextItem extends AATexGroupItem implements ActiveableGroupItem {
   BorderSide? get highlightBorder => _highlightBorder;
 
   @override
-  TextItem copyWith({bool? isActive, Color? highlightColor, BorderSide? highlightBorder}) {
+  TextItem copyWith({
+    bool? isActive,
+    Color? highlightColor,
+    BorderSide? highlightBorder,
+  }) {
     return TextItem(
       id: _id,
       text: s,
@@ -294,7 +345,11 @@ class RichTextItem extends AATexGroupItem implements ActiveableGroupItem {
   BorderSide? get highlightBorder => _highlightBorder;
 
   @override
-  RichTextItem copyWith({bool? isActive, Color? highlightColor, BorderSide? highlightBorder}) {
+  RichTextItem copyWith({
+    bool? isActive,
+    Color? highlightColor,
+    BorderSide? highlightBorder,
+  }) {
     return RichTextItem(
       id: _id,
       title: title,

@@ -38,7 +38,8 @@ abstract class BoardPhantomControllerDelegate {
   );
 }
 
-class BoardPhantomController extends OverlapDragTargetDelegate implements CrossReorderFlexDragTargetDelegate {
+class BoardPhantomController extends OverlapDragTargetDelegate
+    implements CrossReorderFlexDragTargetDelegate {
   BoardPhantomController({
     required this.delegate,
     required this.groupsState,
@@ -59,7 +60,8 @@ class BoardPhantomController extends OverlapDragTargetDelegate implements CrossR
   ///
   bool shouldReorder(String groupId) {
     if (phantomRecord != null) {
-      return phantomRecord!.toGroupId == groupId && phantomRecord!.fromGroupId == groupId;
+      return phantomRecord!.toGroupId == groupId &&
+          phantomRecord!.fromGroupId == groupId;
     }
     return true;
   }
@@ -97,7 +99,8 @@ class BoardPhantomController extends OverlapDragTargetDelegate implements CrossR
         item,
       );
 
-      Log.debug("[$BoardPhantomController] did move ${phantomRecord.toString()}");
+      Log.debug(
+          "[$BoardPhantomController] did move ${phantomRecord.toString()}");
       phantomRecord = null;
     }
   }
@@ -287,11 +290,13 @@ class PhantomRecord<T> {
   }
 
   @override
-  String toString() => 'Group:[$fromGroupId]:$fromGroupIndex to Group:[$toGroupId]:$toGroupIndex';
+  String toString() =>
+      'Group:[$fromGroupId]:$fromGroupIndex to Group:[$toGroupId]:$toGroupIndex';
 }
 
 class PhantomGroupItem extends AATexGroupItem {
-  PhantomGroupItem(PassthroughPhantomContext insertedPhantom) : phantomContext = insertedPhantom;
+  PhantomGroupItem(PassthroughPhantomContext insertedPhantom)
+      : phantomContext = insertedPhantom;
 
   final PassthroughPhantomContext phantomContext;
 
@@ -303,8 +308,9 @@ class PhantomGroupItem extends AATexGroupItem {
 
   Size? get feedbackSize => phantomContext.feedbackSize;
 
-  Widget get draggingWidget =>
-      phantomContext.draggingWidget == null ? const SizedBox() : phantomContext.draggingWidget!;
+  Widget get draggingWidget => phantomContext.draggingWidget == null
+      ? const SizedBox()
+      : phantomContext.draggingWidget!;
 
   @override
   String toString() => 'phantom:$id';
@@ -328,7 +334,8 @@ class PassthroughPhantomContext extends FakeDragTargetEventTrigger
 
   Widget? get draggingWidget => dragTargetData.draggingWidget;
 
-  AATexGroupItem get itemData => dragTargetData.reorderFlexItem as AATexGroupItem;
+  AATexGroupItem get itemData =>
+      dragTargetData.reorderFlexItem as AATexGroupItem;
 
   @override
   void Function(int?)? onInserted;

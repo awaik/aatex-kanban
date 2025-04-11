@@ -112,7 +112,8 @@ class AAtexBoardGroup extends StatefulWidget {
 }
 
 class _AAtexBoardGroupState extends State<AAtexBoardGroup> {
-  final GlobalKey _columnOverlayKey = GlobalKey(debugLabel: '$AAtexBoardGroup overlay key');
+  final GlobalKey _columnOverlayKey =
+      GlobalKey(debugLabel: '$AAtexBoardGroup overlay key');
   late BoardOverlayEntry _overlayEntry;
 
   @override
@@ -121,11 +122,15 @@ class _AAtexBoardGroupState extends State<AAtexBoardGroup> {
 
     _overlayEntry = BoardOverlayEntry(
       builder: (BuildContext context) {
-        final children = widget.dataSource.groupData.items.map((item) => _buildWidget(context, item)).toList();
+        final children = widget.dataSource.groupData.items
+            .map((item) => _buildWidget(context, item))
+            .toList();
 
-        final header = widget.headerBuilder?.call(context, widget.dataSource.groupData);
+        final header =
+            widget.headerBuilder?.call(context, widget.dataSource.groupData);
 
-        final footer = widget.footerBuilder?.call(context, widget.dataSource.groupData);
+        final footer =
+            widget.footerBuilder?.call(context, widget.dataSource.groupData);
 
         final interceptor = CrossReorderFlexDragTargetInterceptor(
           reorderFlexId: widget.groupId,
@@ -153,7 +158,8 @@ class _AAtexBoardGroupState extends State<AAtexBoardGroup> {
                 },
                 onReorder: (fromIndex, toIndex) {
                   if (widget.phantomController.shouldReorder(widget.groupId)) {
-                    widget.onReorder(widget.groupId, fromIndex, toIndex, widget.dataSource.groupData.items[fromIndex]);
+                    widget.onReorder(widget.groupId, fromIndex, toIndex,
+                        widget.dataSource.groupData.items[fromIndex]);
                     widget.phantomController.updateIndex(fromIndex, toIndex);
                   }
                 },

@@ -26,7 +26,11 @@ class _SingleBoardListExampleState extends State<SingleBoardListExample> {
         items.add(TextItem(itemId));
       }
 
-      final column = AATexGroupData(id: "column_$colIndex", name: "Column $colIndex", items: items);
+      final column = AATexGroupData(
+        id: "column_$colIndex",
+        name: "Column $colIndex",
+        items: items,
+      );
 
       boardData.addGroup(column);
     }
@@ -34,7 +38,11 @@ class _SingleBoardListExampleState extends State<SingleBoardListExample> {
 
   void _showCard() {
     // Display card #43 in column 8
-    boardData.displayCard(groupId: "column_8", itemId: "item_8_43", highlightColor: Colors.amber.withOpacity(0.5));
+    boardData.displayCard(
+      groupId: "column_8",
+      itemId: "item_8_43",
+      highlightColor: Colors.amber.withOpacity(0.5),
+    );
   }
 
   @override
@@ -44,13 +52,19 @@ class _SingleBoardListExampleState extends State<SingleBoardListExample> {
         title: const Text('AATexBoard Example'),
         actions: [
           // Button to trigger highlighting card in column 8, item #43
-          ElevatedButton(onPressed: _showCard, child: const Text('Find card 8-43')),
+          ElevatedButton(
+            onPressed: _showCard,
+            child: const Text('Find card 8-43'),
+          ),
         ],
       ),
       body: AATexBoard(
         controller: boardData,
         cardBuilder: (context, column, columnItem) {
-          return _RowWidget(item: columnItem as TextItem, key: ObjectKey(columnItem));
+          return _RowWidget(
+            item: columnItem as TextItem,
+            key: ObjectKey(columnItem),
+          );
         },
       ),
     );
@@ -70,14 +84,25 @@ class _RowWidget extends StatelessWidget {
 
     // Создаем decoration с рамкой, если элемент активен
     BoxDecoration decoration = BoxDecoration(
-      color: isActive ? (highlightColor ?? Colors.blue.withOpacity(0.3)) : Colors.green,
+      color:
+          isActive
+              ? (highlightColor ?? Colors.blue.withOpacity(0.3))
+              : Colors.green,
     );
 
     // Добавляем рамку для активного элемента
     if (isActive && highlightBorder != null) {
       decoration = BoxDecoration(
-        color: isActive ? (highlightColor ?? Colors.blue.withOpacity(0.3)) : Colors.green,
-        border: Border(top: highlightBorder, left: highlightBorder, right: highlightBorder, bottom: highlightBorder),
+        color:
+            isActive
+                ? (highlightColor ?? Colors.blue.withOpacity(0.3))
+                : Colors.green,
+        border: Border(
+          top: highlightBorder,
+          left: highlightBorder,
+          right: highlightBorder,
+          bottom: highlightBorder,
+        ),
         borderRadius: BorderRadius.circular(4),
       );
     }
@@ -106,10 +131,14 @@ class TextItem extends AATexGroupItem implements ActiveableGroupItem {
   final Color? _highlightColor;
   final BorderSide? _highlightBorder;
 
-  TextItem(this.s, {bool isActive = false, Color? highlightColor, BorderSide? highlightBorder})
-    : _isActive = isActive,
-      _highlightColor = highlightColor,
-      _highlightBorder = highlightBorder;
+  TextItem(
+    this.s, {
+    bool isActive = false,
+    Color? highlightColor,
+    BorderSide? highlightBorder,
+  }) : _isActive = isActive,
+       _highlightColor = highlightColor,
+       _highlightBorder = highlightBorder;
 
   @override
   String get id => s;
@@ -124,7 +153,11 @@ class TextItem extends AATexGroupItem implements ActiveableGroupItem {
   BorderSide? get highlightBorder => _highlightBorder;
 
   @override
-  TextItem copyWith({bool? isActive, Color? highlightColor, BorderSide? highlightBorder}) {
+  TextItem copyWith({
+    bool? isActive,
+    Color? highlightColor,
+    BorderSide? highlightBorder,
+  }) {
     return TextItem(
       s,
       isActive: isActive ?? _isActive,

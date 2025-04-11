@@ -38,12 +38,18 @@ class _MyAppState extends State<MyApp> {
           showUnselectedLabels: false,
           currentIndex: _currentIndex,
           items: [
-            BottomNavigationBarItem(icon: Icon(Icons.grid_on, color: _bottomNavigationColor), label: "MultiColumn"),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.grid_on, color: _bottomNavigationColor),
+              label: "MultiColumn",
+            ),
             BottomNavigationBarItem(
               icon: Icon(Icons.grid_on, color: _bottomNavigationColor),
               label: "MultiShrinkwrapColumn ",
             ),
-            BottomNavigationBarItem(icon: Icon(Icons.grid_on, color: _bottomNavigationColor), label: "SingleColumn"),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.grid_on, color: _bottomNavigationColor),
+              label: "SingleColumn",
+            ),
           ],
           onTap: (int index) {
             setState(() {

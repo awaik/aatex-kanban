@@ -28,7 +28,10 @@ mixin ReorderFlexMixin {
         child: SizeTransition(
           sizeFactor: sizeFactor,
           axis: direction,
-          child: FadeTransition(opacity: animationController.drive(CurveTween(curve: Curves.easeInOut)), child: child),
+          child: FadeTransition(
+              opacity: animationController
+                  .drive(CurveTween(curve: Curves.easeInOut)),
+              child: child),
         ),
       );
     }
@@ -57,7 +60,10 @@ mixin ReorderFlexMixin {
         child: SizeTransition(
           sizeFactor: sizeFactor,
           axis: direction,
-          child: FadeTransition(opacity: animationController.drive(CurveTween(curve: Curves.easeInOut)), child: child),
+          child: FadeTransition(
+              opacity: animationController
+                  .drive(CurveTween(curve: Curves.easeInOut)),
+              child: child),
         ),
       );
     }
