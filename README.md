@@ -4,6 +4,8 @@ AATex Kanban Board is a fork of the [AppFlowy Kanban Board](https://github.com/A
 
 ---
 
+![Demo](https://raw.githubusercontent.com/awaik/aatex-kanban/refs/heads/main/example/example-gif.gif)
+
 ## Features
 
 - Drag and drop cards within and between columns
