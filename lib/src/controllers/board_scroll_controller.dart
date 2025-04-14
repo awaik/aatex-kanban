@@ -5,6 +5,9 @@ import 'package:flutter/material.dart';
 class AATexBoardScrollController {
   AATexBoardState? _boardState;
 
+  /// Returns the current board state if it exists
+  AATexBoardState? get boardState => _boardState;
+
   /// Sets the board state - used internally by AATexBoard
   void setBoardState(AATexBoardState state) {
     _boardState = state;

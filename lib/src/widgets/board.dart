@@ -14,7 +14,6 @@ import 'reorder_flex/drag_target_interceptor.dart';
 import 'reorder_flex/reorder_flex.dart';
 import 'reorder_phantom/phantom_controller.dart';
 
-
 class AATexBoardConfig {
   const AATexBoardConfig.config({
     this.boardCornerRadius = 6.0,
@@ -126,13 +125,18 @@ class AATexBoard extends StatelessWidget {
       value: controller,
       child: Consumer<AATexBoardController>(
         builder: (context, notifier, child) {
-          final boardState = AATexBoardState();
+          // Create a new state only if it doesn't exist yet or preserve the existing one
+          final boardState =
+              boardScrollController?.boardState ?? AATexBoardState();
           final phantomController = BoardPhantomController(
             delegate: controller,
             groupsState: boardState,
           );
 
-          boardScrollController?.setBoardState(boardState);
+          // Save the state in the controller to preserve it between rebuilds
+          if (boardScrollController != null) {
+            boardScrollController!.setBoardState(boardState);
+          }
 
           return _AATexBoardContent(
             config: config,
