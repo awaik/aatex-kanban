@@ -8,6 +8,7 @@ export 'src/widgets/board_group/group_data.dart'
         AATexGroupController,
         AATexGroupHeaderData,
         ActiveableGroupItem;
-export 'src/widgets/board_data.dart';
+export 'src/controllers/board_controller.dart';
 export 'src/widgets/styled_widgets/widgets.dart';
 export 'src/widgets/board.dart';
+export 'src/controllers/board_scroll_controller.dart';

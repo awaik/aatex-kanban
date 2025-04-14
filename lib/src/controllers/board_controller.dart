@@ -1,6 +1,7 @@
 import 'dart:collection';
 import 'dart:async';
 
+import 'package:aatex_board/src/controllers/board_scroll_controller.dart';
 import 'package:flutter/material.dart';
 
 import 'package:equatable/equatable.dart';
@@ -10,8 +11,8 @@ import 'package:aatex_board/src/widgets/board.dart';
 
 import '../utils/log.dart';
 
-import 'reorder_flex/reorder_flex.dart';
-import 'reorder_phantom/phantom_controller.dart';
+import '../widgets/reorder_flex/reorder_flex.dart';
+import '../widgets/reorder_phantom/phantom_controller.dart';
 
 typedef OnMoveGroup = void Function(
   String fromGroupId,
