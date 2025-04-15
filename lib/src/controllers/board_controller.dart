@@ -421,7 +421,7 @@ class AATexBoardController extends ChangeNotifier
 
         final color = highlightColor ?? Colors.amber.shade200;
 
-        final updatedItem = (targetItem as ActiveableGroupItem).copyWith(
+        final ActiveableGroupItem updatedItem = (targetItem as ActiveableGroupItem).copyWith(
           isActive: true,
           highlightColor: color,
           highlightBorder: highlightBorder,

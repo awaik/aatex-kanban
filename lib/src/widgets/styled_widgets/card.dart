@@ -22,41 +22,63 @@ class AATexGroupCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // If an item is provided and it implements the ActiveableGroupItem interface,
-    // check its active state and apply the appropriate decoration
-    BoxDecoration finalDecoration = decoration;
-
-    if (item != null && item is ActiveableGroupItem) {
-      final activeItem = item as ActiveableGroupItem;
-      if (activeItem.isActive) {
-        // Apply the active element style
-        if (activeItem.highlightBorder != null) {
-          finalDecoration = BoxDecoration(
-            color: activeItem.highlightColor,
-            border: Border(
-              top: activeItem.highlightBorder!,
-              left: activeItem.highlightBorder!,
-              right: activeItem.highlightBorder!,
-              bottom: activeItem.highlightBorder!,
-            ),
-            borderRadius: decoration.borderRadius,
-          );
-        } else if (activeItem.highlightColor != null) {
-          // If there's only a highlight color
-          finalDecoration = BoxDecoration(
-            color: activeItem.highlightColor,
-            borderRadius: decoration.borderRadius,
-          );
-        }
-      }
-    }
-
-    return Container(
+    // Base card with original decoration
+    Widget cardWidget = Container(
       clipBehavior: Clip.hardEdge,
       margin: margin,
       constraints: boxConstraints,
-      decoration: finalDecoration,
+      decoration: decoration,
       child: child,
     );
+
+    // If an item is provided and it implements the ActiveableGroupItem interface,
+    // check its active state and apply overlay if needed
+    if (item != null && item is ActiveableGroupItem) {
+      final activeItem = item as ActiveableGroupItem;
+      if (activeItem.isActive) {
+        // Instead of changing the card's color, we stack a semi-transparent overlay and border on top
+        cardWidget = Stack(
+          children: [
+            // Original card
+            cardWidget,
+            // Overlay with highlight color at 10% opacity
+            if (activeItem.highlightColor != null)
+              Positioned.fill(
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: activeItem.highlightColor,
+                    border: activeItem.highlightBorder != null
+                        ? Border(
+                            top: activeItem.highlightBorder!,
+                            left: activeItem.highlightBorder!,
+                            right: activeItem.highlightBorder!,
+                            bottom: activeItem.highlightBorder!,
+                          )
+                        : null,
+                  ),
+                ),
+              ),
+            // Full color border
+            if (activeItem.highlightBorder != null)
+              Positioned.fill(
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: Colors.transparent,
+                    border: Border(
+                      top: activeItem.highlightBorder!,
+                      left: activeItem.highlightBorder!,
+                      right: activeItem.highlightBorder!,
+                      bottom: activeItem.highlightBorder!,
+                    ),
+                    borderRadius: decoration.borderRadius,
+                  ),
+                ),
+              ),
+          ],
+        );
+      }
+    }
+
+    return cardWidget;
   }
 }
