@@ -73,7 +73,7 @@ class _MultiBoardListExampleState extends State<MultiBoardListExample> {
     }
   }
 
-  void _showCard() {
+  void _showCard() async {
     print('====== SHOW CARD BUTTON PRESSED ======');
     print('Attempting to display card #43 in column 8');
 
@@ -83,7 +83,6 @@ class _MultiBoardListExampleState extends State<MultiBoardListExample> {
           .displayCard(
             groupId: "column_8",
             itemId: "item_8_43",
-            highlightColor: Colors.amber.withOpacity(0.5),
             boardScrollController:
                 boardController, // Pass the scroll controller
           )
@@ -103,7 +102,7 @@ class _MultiBoardListExampleState extends State<MultiBoardListExample> {
   @override
   Widget build(BuildContext context) {
     final config = AATexBoardConfig.config(
-      groupBackgroundColor: HexColor.fromHex('#F7F8FC'),
+      groupBackgroundColor: Colors.blueGrey.withValues(alpha: 0.4),
       stretchGroupHeight: false,
     );
     return Scaffold(
@@ -122,6 +121,7 @@ class _MultiBoardListExampleState extends State<MultiBoardListExample> {
         cardBuilder: (context, group, groupItem) {
           return AATexGroupCard(
             key: ValueKey(groupItem.id),
+            item: groupItem,
             child: _buildCard(groupItem),
           );
         },
@@ -166,64 +166,18 @@ class _MultiBoardListExampleState extends State<MultiBoardListExample> {
   }
 
   Widget _buildCard(AATexGroupItem item) {
-    // Check if the item is active
-    final isActive =
-        item is ActiveableGroupItem && (item as ActiveableGroupItem).isActive;
-    final highlightColor =
-        (item is ActiveableGroupItem)
-            ? (item as ActiveableGroupItem).highlightColor
-            : null;
-    final highlightBorder =
-        (item is ActiveableGroupItem)
-            ? (item as ActiveableGroupItem).highlightBorder
-            : null;
-
-    // Apply decoration with border if active
-    BoxDecoration? decoration;
-
-    if (isActive) {
-      if (highlightBorder != null) {
-        // Используем highlightBorder для создания рамки
-        decoration = BoxDecoration(
-          color: highlightColor,
-          border: Border(
-            top: highlightBorder,
-            left: highlightBorder,
-            right: highlightBorder,
-            bottom: highlightBorder,
-          ),
-          borderRadius: BorderRadius.circular(4),
-        );
-      } else {
-        // Используем стандартную рамку, если highlightBorder не задан
-        decoration = BoxDecoration(
-          color: highlightColor ?? Colors.blue.withOpacity(0.2),
-          border: Border.all(color: Colors.blue, width: 2),
-          borderRadius: BorderRadius.circular(4),
-        );
-      }
-    }
-
     if (item is TextItem) {
-      return Container(
-        decoration: decoration,
-        child: Align(
-          alignment: Alignment.centerLeft,
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 30),
-            child: Text(
-              item.s,
-              style: TextStyle(
-                fontWeight: isActive ? FontWeight.bold : FontWeight.normal,
-              ),
-            ),
-          ),
+      return Align(
+        alignment: Alignment.centerLeft,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 30),
+          child: Text(item.s, style: TextStyle(fontWeight: FontWeight.normal)),
         ),
       );
     }
 
     if (item is RichTextItem) {
-      return Container(decoration: decoration, child: RichTextCard(item: item));
+      return Container(child: RichTextCard(item: item));
     }
 
     throw UnimplementedError();
@@ -232,7 +186,7 @@ class _MultiBoardListExampleState extends State<MultiBoardListExample> {
 
 class RichTextCard extends StatefulWidget {
   final RichTextItem item;
-  const RichTextCard({required this.item, Key? key}) : super(key: key);
+  const RichTextCard({required this.item, super.key});
 
   @override
   State<RichTextCard> createState() => _RichTextCardState();
@@ -358,14 +312,5 @@ class RichTextItem extends AATexGroupItem implements ActiveableGroupItem {
       highlightColor: highlightColor ?? _highlightColor,
       highlightBorder: highlightBorder ?? _highlightBorder,
     );
-  }
-}
-
-extension HexColor on Color {
-  static Color fromHex(String hexString) {
-    final buffer = StringBuffer();
-    if (hexString.length == 6 || hexString.length == 7) buffer.write('ff');
-    buffer.write(hexString.replaceFirst('#', ''));
-    return Color(int.parse(buffer.toString(), radix: 16));
   }
 }

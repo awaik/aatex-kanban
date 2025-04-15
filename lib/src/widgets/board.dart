@@ -214,7 +214,7 @@ class _AATexBoardContentState extends State<_AATexBoardContent> {
   void initState() {
     super.initState();
 
-    // Сохраняем ссылку на контроллер прокрутки в boardState для использования в scrollToGroup
+    // Save a reference to the scroll controller in boardState for use in scrollToGroup
     widget.boardState.horizontalScrollController = _scrollController;
 
     _overlayEntry = BoardOverlayEntry(
@@ -271,7 +271,7 @@ class _AATexBoardContentState extends State<_AATexBoardContent> {
   List<Widget> _buildColumns() {
     final List<Widget> children = [];
 
-    // Создаем список виджетов колонок
+    // Create a list of column widgets
     final columnWidgets =
         widget.boardController.groupDatas.asMap().entries.map((item) {
       final columnData = item.value;
@@ -317,19 +317,19 @@ class _AATexBoardContentState extends State<_AATexBoardContent> {
       );
     }).toList();
 
-    // Добавляем виджеты в список children
+    // Add widgets to the children list
     children.addAll(columnWidgets);
 
-    // Добавляем функцию для сохранения ссылок на элементы после построения
-    // Это нужно для метода scrollToGroup
+    // Add a function to save references to elements after building
+    // This is needed for the scrollToGroup method
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      // Очищаем предыдущие элементы
+      // Clear previous elements
       widget.boardState.boardContentChildren.clear();
 
-      // Для каждого элемента с ключом находим его в дереве элементов
+      // For each element with a key, find it in the element tree
       for (final columnData in widget.boardController.groupDatas) {
         final columnKey = ValueKey(columnData.id);
-        // Используем context для поиска элемента по ключу
+        // Use context to find the element by key
         Element? element;
         void findElementWithKey(Element e) {
           if (e.widget.key == columnKey) {

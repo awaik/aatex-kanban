@@ -32,17 +32,17 @@ class AATexBoardScrollController {
       return;
     }
 
-    // Ищем ключ для колонки непосредственно среди ключей, а не их содержимого
+    // Look for the column key directly among the keys, not their content
     final columnKeys = _boardState!.groupDragTargetKeys.keys.toList();
     Log.debug(
         '[scrollToGroup] Available column keys: ${columnKeys.join(', ')}');
 
-    // Получаем контекст родительского контейнера этой колонки через элемент в этой колонке
+    // Get the context of the parent container of this column through an element in this column
     BuildContext? targetContext;
     if (columnKeys.contains(groupId)) {
       Log.debug('[scrollToGroup] Found direct key for groupId=$groupId');
 
-      // Получаем первую карточку в нужной колонке для получения её контекста
+      // Get the first card in the needed column to obtain its context
       final cardKeys = _boardState!.groupDragTargetKeys[groupId]?.values;
       if (cardKeys != null && cardKeys.isNotEmpty) {
         for (final cardKey in cardKeys) {
@@ -54,12 +54,12 @@ class AATexBoardScrollController {
       }
     }
 
-    // Если не нашли контекст в целевой колонке, ищем любой контекст для коллбэка
+    // If we didn't find a context in the target column, we're looking for any context for the callback
     if (targetContext == null) {
       Log.warn(
           '[scrollToGroup] No direct context found in target column, searching other columns...');
 
-      // Попробуем найти колонку используя ValueKey
+      // Let's try to find the column using ValueKey
       for (final child in _boardState!.boardContentChildren) {
         if (child.widget.key is ValueKey &&
             (child.widget.key as ValueKey).value == groupId) {
@@ -72,7 +72,7 @@ class AATexBoardScrollController {
         }
       }
 
-      // Если всё еще не нашли контекст, берем любой доступный
+      // If we still haven't found a context, we take any available one
       if (targetContext == null) {
         targetContext = _getAnyAvailableContext();
         if (targetContext == null) {
@@ -83,21 +83,21 @@ class AATexBoardScrollController {
       }
     }
 
-    // Находим виджет колонки через родительский контекст
+    // Find the column widget through the parent context
     Element? columnElement;
     targetContext!.visitAncestorElements((element) {
       if (element.widget.key is ValueKey &&
           (element.widget.key as ValueKey).value == groupId) {
         columnElement = element;
-        return false; // прекращаем поиск
+        return false; // stop the search
       }
-      return true; // продолжаем поиск
+      return true; // continue searching
     });
 
     if (columnElement == null) {
       Log.warn(
           '[scrollToGroup] Could not find column element with key=$groupId, searching by widget type');
-      // Если не нашли по ключу, пробуем найти по типу виджета и данным
+      // If we didn't find by key, try to find by widget type and data
       targetContext.visitAncestorElements((element) {
         if (element.widget is ConstrainedBox &&
             element.toString().contains(groupId)) {
@@ -114,7 +114,7 @@ class AATexBoardScrollController {
       columnElement = targetContext as Element;
     }
 
-    // Получаем ScrollController для горизонтальной прокрутки
+    // Get ScrollController for horizontal scrolling
     final scrollController = _boardState!.horizontalScrollController;
     if (scrollController == null || !scrollController.hasClients) {
       Log.warn('[scrollToGroup] ScrollController is null or has no clients');
@@ -124,11 +124,11 @@ class AATexBoardScrollController {
       return;
     }
 
-    // Прокручиваем к группе
+    // Scroll to the group
     final RenderBox box = columnElement!.renderObject as RenderBox;
     final position = box.localToGlobal(Offset.zero);
 
-    // Размеры и позиции
+    // Dimensions and positions
     final screenWidth = WidgetsBinding.instance.window.physicalSize.width /
         WidgetsBinding.instance.window.devicePixelRatio;
     final groupWidth = box.size.width;
@@ -137,20 +137,20 @@ class AATexBoardScrollController {
     Log.debug(
         '[scrollToGroup] Screen width: $screenWidth, Group width: $groupWidth');
 
-    // Пытаемся центрировать колонку на экране
+    // Try to center the column on the screen
     final targetOffset = position.dx - (screenWidth / 2) + (groupWidth / 2);
     Log.debug(
         '[scrollToGroup] Current scroll position: ${scrollController.position.pixels}');
     Log.debug('[scrollToGroup] Target offset before clamping: $targetOffset');
 
-    // Убеждаемся, что не прокручиваем за пределы диапазона
+    // Make sure we don't scroll beyond the range
     final clampedOffset = targetOffset.clamp(
         scrollController.position.minScrollExtent,
         scrollController.position.maxScrollExtent);
     Log.debug(
         '[scrollToGroup] Final clamped offset for scrolling: $clampedOffset');
 
-    // Если уже находимся на нужной позиции или очень близко, не прокручиваем
+    // If we're already at the right position or very close, don't scroll
     if ((scrollController.position.pixels - clampedOffset).abs() < 5.0) {
       Log.debug(
           '[scrollToGroup] Already at target position, no need to scroll');
@@ -160,10 +160,10 @@ class AATexBoardScrollController {
       return;
     }
 
-    // Выполняем прокрутку
+    // Perform scrolling
     Log.debug('[scrollToGroup] Animating to offset: $clampedOffset');
 
-    // Сохраняем ссылку на текущий контекст, пока он действителен
+    // Save a reference to the current context while it's valid
     final contextToUse = targetContext;
 
     scrollController
@@ -175,10 +175,10 @@ class AATexBoardScrollController {
         .then((_) {
       Log.debug('[scrollToGroup] Scroll animation completed');
       if (completed != null && contextToUse != null) {
-        // Вызываем коллбэк только если контекст не null
+        // Call the callback only if the context is not null
         completed(contextToUse);
       } else if (completed != null) {
-        // Если контекст стал null, найдем новый контекст
+        // If the context became null, let's find a new context
         final newContext = _getAnyAvailableContext();
         if (newContext != null) {
           completed(newContext);
@@ -190,7 +190,7 @@ class AATexBoardScrollController {
     }).catchError((error) {
       Log.error('[scrollToGroup] Error during scroll animation: $error');
       if (completed != null) {
-        // В случае ошибки пытаемся получить актуальный контекст
+        // In case of error, try to get an up-to-date context
         final errorContext = _getAnyAvailableContext();
         if (errorContext != null) {
           completed(errorContext);
@@ -202,11 +202,11 @@ class AATexBoardScrollController {
     });
   }
 
-  /// Вспомогательный метод для получения любого доступного контекста
+  /// Helper method for getting any available context
   BuildContext? _getAnyAvailableContext() {
     if (_boardState == null) return null;
 
-    // Пытаемся найти любой доступный контекст из драг-таргетов
+    // Try to find any available context from drag targets
     for (final groupKeys in _boardState!.groupDragTargetKeys.values) {
       for (final key in groupKeys.values) {
         if (key.currentContext != null) {
