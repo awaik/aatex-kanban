@@ -82,7 +82,9 @@ class AAtexBoardGroup extends StatefulWidget {
     this.cornerRadius = 0.0,
     this.backgroundColor = Colors.transparent,
     this.stretchGroupHeight = true,
-  }) : config = const ReorderFlexConfig();
+  }) : config = const ReorderFlexConfig(
+          dragDirection: Axis.vertical,
+        );
 
   final AATexBoardCardBuilder cardBuilder;
   final OnGroupReorder onReorder;
